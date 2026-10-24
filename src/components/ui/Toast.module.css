@@ -1,0 +1,11 @@
+.toast {
+  position: fixed; top: 16px; left: 50%;
+  transform: translate(-50%, calc(-100% - 24px));
+  visibility: hidden;
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px 16px;
+  font-size: .9rem; z-index: 3000;
+  max-width: calc(100vw - 32px);
+  transition: transform .2s, visibility .2s;
+}
+.show { transform: translate(-50%, 0); visibility: visible; }

@@ -1,0 +1,12 @@
+.foot {
+  display: flex; justify-content: center; align-items: center; flex-wrap: wrap;
+  gap: 8px 26px;
+  padding: 28px 16px 36px;
+  font-size: .92rem;
+  color: var(--ink-soft);
+}
+.foot a, .foot button {
+  font: inherit; color: var(--ink-soft); text-decoration: none;
+  background: none; border: none; padding: 0; cursor: pointer;
+}
+.foot a:hover, .foot button:hover { color: var(--ink); background: none; }

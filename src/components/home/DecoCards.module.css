@@ -1,0 +1,66 @@
+.deco {
+  position: absolute;
+  border-radius: 28px;
+  background: rgba(24, 19, 29, .55);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 20px 60px rgba(0,0,0,.35);
+  padding: 18px;
+  pointer-events: none;
+  transform: rotate(var(--r));
+  animation: float 9s ease-in-out infinite;
+}
+.img { border-radius: 18px; }
+.bar { height: 10px; border-radius: 6px; background: rgba(255,255,255,.07); margin-top: 12px; }
+
+.d1 { top: -10px; left: -40px; width: 200px; --r: -10deg; opacity: .8; }
+.d1 .img { height: 100px; background: linear-gradient(135deg, #e6b56a, #b77c55); }
+
+.d2 { top: 40px; right: -30px; width: 190px; --r: 8deg; animation-delay: -3s; opacity: .85; }
+.d2 .img {
+  height: 110px;
+  background: linear-gradient(135deg, #f2a6c4, #c56d93);
+  display: flex; align-items: center; justify-content: flex-end; padding-right: 22px;
+  font-size: 2.4rem;
+}
+
+.d3 { bottom: 70px; left: 30px; width: 180px; --r: -4deg; animation-delay: -6s; opacity: .75; }
+.blobs { display: flex; gap: 10px; }
+.blobs span { width: 50px; height: 50px; border-radius: 16px; }
+
+.d4 {
+  bottom: 110px; right: 40px;
+  --r: -3deg;
+  animation-delay: -4.5s;
+  display: grid; gap: 10px;
+  border-radius: 20px; padding: 16px;
+}
+.row { display: flex; align-items: center; gap: 6px; }
+.letter {
+  width: 30px; height: 30px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .78rem; font-weight: 700; color: #fff; margin-right: 4px;
+}
+.sq { width: 24px; height: 24px; border-radius: 5px; }
+.liveTag {
+  font-size: .72rem; color: var(--ink-soft);
+  display: flex; align-items: center; gap: 6px; margin-top: 2px;
+}
+.liveTag::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #3ecf8e; }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(var(--r)); }
+  50% { transform: translateY(-12px) rotate(var(--r)); }
+}
+
+@media (max-width: 960px) {
+  .d1, .d3 { display: none; }
+  .d2 { right: -90px; opacity: .45; }
+  .d4 { bottom: 40px; right: -20px; opacity: .55; }
+}
+@media (max-width: 600px) {
+  .d2, .d4 { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .deco { animation: none; }
+}

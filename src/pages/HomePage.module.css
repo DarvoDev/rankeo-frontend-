@@ -1,0 +1,26 @@
+.landing {
+  --ink: #f4f1f6;
+  --ink-soft: #a9a2b0;
+  --glass: rgba(22, 17, 27, .62);
+  --glass-border: rgba(255, 255, 255, .08);
+  --grad-word: linear-gradient(95deg, #f0609e 0%, #f58f5c 50%, #f7c548 100%);
+  min-height: 100vh;
+  font-family: "DM Sans Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: var(--ink);
+  background-color: #140f18;
+  background-image:
+    radial-gradient(60% 55% at 45% 8%, rgba(120, 22, 62, .55), transparent 70%),
+    radial-gradient(45% 50% at 0% 60%, rgba(16, 92, 104, .45), transparent 70%),
+    radial-gradient(45% 55% at 100% 70%, rgba(72, 38, 110, .45), transparent 70%);
+  background-attachment: fixed;
+  overflow-x: hidden;
+}
+/* Textura de líneas muy sutil sobre el fondo */
+.landing::before {
+  content: "";
+  position: fixed; inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(255,255,255,.018) 0 1px, transparent 1px 4px);
+  z-index: 0;
+}
+.landing > * { position: relative; z-index: 1; }

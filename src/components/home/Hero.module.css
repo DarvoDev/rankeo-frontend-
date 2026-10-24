@@ -1,0 +1,78 @@
+.hero {
+  min-height: calc(100vh - 80px);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center;
+  padding: 40px 16px 120px;
+}
+.badge {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-size: .88rem; color: #d9d3de;
+  background: var(--glass); border: 1px solid var(--glass-border);
+  border-radius: 999px; padding: 7px 16px;
+  text-decoration: none;
+  backdrop-filter: blur(8px);
+  margin-bottom: 36px;
+}
+.badge:hover { border-color: rgba(255,255,255,.18); }
+.live {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #3ecf8e; box-shadow: 0 0 0 4px rgba(62,207,142,.15);
+}
+.arrow { color: var(--ink-soft); }
+
+.hero h1 {
+  font-size: clamp(2.6rem, 6.4vw, 4.8rem);
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -.02em;
+  margin: 0 0 28px;
+}
+.hero h1 em {
+  font-style: italic;
+  font-weight: 700;
+  background: var(--grad-word);
+  -webkit-background-clip: text; background-clip: text;
+  color: transparent;
+  padding-right: .08em; /* evita que la itálica se recorte */
+}
+.sub {
+  max-width: 640px;
+  font-size: clamp(1.02rem, 1.6vw, 1.22rem);
+  line-height: 1.65;
+  color: var(--ink-soft);
+  margin: 0 0 44px;
+}
+
+.createPill {
+  width: 100%; max-width: 510px;
+  display: flex; align-items: center; gap: 8px;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  padding: 7px 7px 7px 22px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 60px rgba(160, 60, 140, .18), 0 10px 40px rgba(0,0,0,.35);
+  transition: border-color .15s, box-shadow .15s;
+}
+.createPill:focus-within {
+  border-color: rgba(255,255,255,.22);
+  box-shadow: 0 0 70px rgba(200, 80, 150, .28), 0 10px 40px rgba(0,0,0,.35);
+}
+.createPill input[type="text"] {
+  flex: 1; min-width: 0;
+  background: none; border: none; padding: 10px 0;
+  color: var(--ink); font-size: 1rem;
+}
+.createPill input::placeholder { color: #7d7584; }
+
+.alt { margin-top: 18px; font-size: .9rem; color: var(--ink-soft); }
+.alt button {
+  font: inherit; background: none; border: none; padding: 0;
+  color: var(--ink); text-decoration: underline; text-underline-offset: 3px;
+}
+.alt button:hover { background: none; color: #fff; }
+
+@media (max-width: 600px) {
+  .hero { padding-bottom: 60px; }
+  .badge { margin-bottom: 26px; }
+}

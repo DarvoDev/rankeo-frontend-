@@ -1,0 +1,14 @@
+/* Solo cambia la opacidad: si se moviera, dnd-kit mediría mal su posición */
+.trash {
+  position: fixed; left: 50%; bottom: 20px;
+  transform: translateX(-50%);
+  padding: 14px 28px; border-radius: 999px;
+  background: #3a1d1d; border: 2px solid #7a3434;
+  color: #ffb3b3; font-weight: 600;
+  white-space: nowrap;
+  z-index: 900;
+  opacity: 0; pointer-events: none;
+  transition: opacity .2s, background .15s;
+}
+.visible { opacity: 1; }
+.over { background: #8a2b2b; color: #fff; }

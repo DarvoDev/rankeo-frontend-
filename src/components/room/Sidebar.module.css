@@ -1,0 +1,32 @@
+.side { display: grid; gap: 16px; position: sticky; top: 16px; }
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+}
+.card h3 {
+  margin: 0 0 12px; font-size: .95rem;
+  display: flex; justify-content: space-between; align-items: center; gap: 8px;
+}
+.card h3 small { color: var(--muted); font-weight: 400; }
+
+.feed {
+  list-style: none; padding: 0; margin: 0;
+  display: grid; gap: 10px;
+  max-height: 70vh; overflow: auto;
+  font-size: .86rem; color: #cfcfcf;
+}
+.feed:empty::before { content: "Aquí aparecerá cada movimiento de la sala."; color: var(--muted); }
+.feed li { display: flex; gap: 8px; align-items: baseline; animation: fadein .4s; }
+.dot { flex: 0 0 8px; height: 8px; border-radius: 50%; }
+.feed time { margin-left: auto; color: var(--muted); font-size: .75rem; padding-left: 6px; white-space: nowrap; }
+
+@keyframes fadein { from { opacity: 0; transform: translateY(-4px); } }
+
+@media (max-width: 900px) {
+  .side { position: static; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .feed li { animation: none; }
+}

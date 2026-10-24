@@ -1,0 +1,12 @@
+.bank {
+  margin-top: 24px;
+  border: 2px dashed #444; border-radius: 12px; padding: 12px;
+  transition: border-color .15s, background .15s;
+}
+.fileOver { border-color: var(--accent); background: rgba(106,169,255,.08); }
+.head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap; margin-bottom: 10px;
+}
+.head h2 { font-size: 1rem; margin: 0; color: var(--muted); font-weight: 600; }
+.pool { border-radius: 6px; }

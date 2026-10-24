@@ -1,0 +1,18 @@
+.item {
+  position: relative;
+  width: var(--cell); height: var(--cell);
+  flex: 0 0 auto;
+  cursor: grab;
+  touch-action: manipulation;
+  user-select: none; -webkit-user-select: none;
+}
+.item img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+.item:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
+
+.placeholder { outline: 2px dashed var(--accent); outline-offset: -4px; }
+.placeholder img { opacity: .2; }
+
+/* La escala va en la imagen: dnd-kit mide el contenedor para decidir hacia dónde se mueve */
+.overlay { cursor: grabbing; }
+.overlay img { transform: scale(1.06); box-shadow: 0 10px 30px rgba(0,0,0,.6); }
+

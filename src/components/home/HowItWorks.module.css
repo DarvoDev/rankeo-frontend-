@@ -1,0 +1,41 @@
+.how {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 24px 100px;
+}
+.how h2 {
+  text-align: center;
+  font-size: clamp(1.8rem, 3.6vw, 2.6rem);
+  font-weight: 600; letter-spacing: -.03em;
+  margin: 0 0 12px;
+}
+.sub { text-align: center; color: var(--ink-soft); margin: 0 0 48px; }
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.card {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 22px;
+  padding: 24px;
+  backdrop-filter: blur(8px);
+}
+.num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; border-radius: 10px;
+  font-weight: 700; font-size: .9rem; color: #17121b;
+  margin-bottom: 18px;
+}
+.card h3 { margin: 0 0 8px; font-size: 1.12rem; font-weight: 600; }
+.card p { margin: 0; color: var(--ink-soft); font-size: .95rem; line-height: 1.6; }
+
+.mini { margin-top: 20px; display: grid; gap: 4px; }
+.mini div { display: flex; gap: 4px; }
+.mini b {
+  width: 22px; height: 22px; border-radius: 5px;
+  font-size: .68rem; color: #111;
+  display: flex; align-items: center; justify-content: center;
+}
+.mini i { width: 22px; height: 22px; border-radius: 5px; background: rgba(255,255,255,.08); }
+
+@media (max-width: 960px) {
+  .grid { grid-template-columns: 1fr; }
+}

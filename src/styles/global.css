@@ -1,0 +1,71 @@
+:root {
+  --bg: #1a1a1a;
+  --surface: #242424;
+  --surface-2: #2d2d2d;
+  --board: #262626;
+  --line: #000;
+  --border: #3a3a3a;
+  --text: #eee;
+  --muted: #9a9a9a;
+  --accent: #6aa9ff;
+  --accent-hover: #82b8ff;
+  --danger: #ff8a8a;
+  --ok: #7fd18b;
+  --cell: 100px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.5;
+}
+a { color: var(--accent); }
+
+button, .btn {
+  font: inherit;
+  font-size: .92rem;
+  color: var(--text);
+  background: #333;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+button:hover, .btn:hover { background: #3d3d3d; }
+button:disabled { opacity: .5; cursor: default; }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: #0b1a2e; font-weight: 600; }
+.btn-primary:hover { background: var(--accent-hover); }
+
+/* Botón blanco tipo píldora de la portada */
+.pill-white {
+  font: inherit; font-size: .88rem; font-weight: 600;
+  background: #fff; color: #17121b;
+  border: none; border-radius: 999px;
+  padding: 10px 18px; cursor: pointer;
+  transition: transform .15s, box-shadow .15s;
+}
+.pill-white:hover { background: #fff; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,255,255,.15); }
+.pill-white:disabled { opacity: .7; transform: none; cursor: progress; }
+
+input[type="text"] {
+  font: inherit;
+  color: var(--text);
+  background: #1c1c1c;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 10px 12px;
+  width: 100%;
+  outline: none;
+}
+input[type="text"]:focus { border-color: var(--accent); }
+label.field { display: block; font-size: .85rem; color: var(--muted); margin-bottom: 6px; }
+.error { color: var(--danger); font-size: .9rem; min-height: 1.4em; margin: 8px 0 0; }
+
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+@media (max-width: 600px) {
+  :root { --cell: 72px; }
+}

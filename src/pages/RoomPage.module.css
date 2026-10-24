@@ -1,0 +1,25 @@
+.room { max-width: 1320px; margin: 0 auto; padding: 16px 16px 96px; }
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: 20px;
+  align-items: start;
+}
+.head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap; margin-bottom: 14px;
+}
+.title {
+  font-size: 1.6rem; font-weight: 700; margin: 0;
+  padding: 2px 6px; border-radius: 6px; outline: none;
+}
+.title:focus { background: #333; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.loading { color: var(--muted); padding: 40px 0; text-align: center; }
+
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .title { font-size: 1.3rem; }
+}
