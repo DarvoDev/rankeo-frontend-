@@ -6,6 +6,8 @@ export interface Item {
   name: string;
   url: string;
   by?: string;
+  /** Subtítulo que se pide al subir la imagen; se ve al pasar el cursor (máx 80) */
+  caption?: string;
 }
 
 export interface Tier {
@@ -23,12 +25,32 @@ export interface Room {
   tiers: Tier[];
   pool: string[];
   items: Record<string, Item>;
+  /** Código de la sala de la que se derivó (sub-tier list), si aplica */
+  parent?: string;
 }
 
 /** Alguien que hace cambios en la sala */
 export interface Person {
   name: string;
   color: string;
+}
+
+/** Alguien conectado ahora mismo a la sala (`id` = conexión) */
+export interface Presence extends Person {
+  id: string;
+  /** Eres tú */
+  me?: boolean;
+}
+
+/** Puntero de otra persona: px relativos a la esquina superior izquierda del tablero */
+export interface RemoteCursor extends Person {
+  id: string;
+  x: number;
+  y: number;
+  /** Imagen que lleva arrastrando, si alguna */
+  dragId?: string | null;
+  /** Su puntero salió de la ventana */
+  away?: boolean;
 }
 
 export type RoomAction =

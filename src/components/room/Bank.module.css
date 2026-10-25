@@ -10,3 +10,4 @@
 }
 .head h2 { font-size: 1rem; margin: 0; color: var(--muted); font-weight: 600; }
 .pool { border-radius: 6px; }
+.head h2 small { color: var(--muted); font-weight: 400; margin-left: 4px; }

@@ -47,9 +47,11 @@ interface Props {
   act: (action: RoomAction, text?: string) => void;
   onFiles: (files: File[]) => void;
   onBlocked: (message: string) => void;
+  /** Imagen que empiezas o terminas de arrastrar (null al soltar); los demás ven una copia seguir tu puntero */
+  onDragChange?: (id: string | null) => void;
 }
 
-export function TierBoard({ room, boardRef, fileOver, act, onFiles, onBlocked }: Props) {
+export function TierBoard({ room, boardRef, fileOver, act, onFiles, onBlocked, onDragChange }: Props) {
   // Mientras arrastras, las filas se pintan desde esta copia; al soltar se confirma un solo cambio
   const [drag, setDrag] = useState<{ id: string; from: string; containers: Containers; keyboard: boolean } | null>(null);
   const containers = drag?.containers ?? containersOf(room);
@@ -115,6 +117,7 @@ export function TierBoard({ room, boardRef, fileOver, act, onFiles, onBlocked }:
 
   function finish() {
     setDrag(null);
+    onDragChange?.(null);
   }
 
   function onDragStart({ active, activatorEvent }: DragStartEvent) {
@@ -122,6 +125,7 @@ export function TierBoard({ room, boardRef, fileOver, act, onFiles, onBlocked }:
     const id = String(active.id);
     const keyboard = activatorEvent instanceof KeyboardEvent;
     setDrag({ id, from: findContainer(snapshot, id)!, containers: snapshot, keyboard });
+    onDragChange?.(id);
   }
 
   // Al pasar a otra fila, mueve la imagen en la vista previa

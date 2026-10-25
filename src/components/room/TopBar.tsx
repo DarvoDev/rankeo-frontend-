@@ -6,10 +6,12 @@ import styles from './TopBar.module.css';
 interface Props {
   code: string;
   status: RoomStatus;
+  /** Sala de la que se derivó esta (sub-tier list) */
+  parent?: string;
   onCopyLink: () => void;
 }
 
-export function TopBar({ code, status, onCopyLink }: Props) {
+export function TopBar({ code, status, parent, onCopyLink }: Props) {
   return (
     <div className={styles.topbar}>
       <div className={styles.group}>
@@ -20,6 +22,11 @@ export function TopBar({ code, status, onCopyLink }: Props) {
           {status === 'online' ? 'En línea' : 'Conectando…'}
         </span>
       </div>
+      {parent && (
+        <Link className={styles.back} to={`/sala/${parent}`} title="Ir a la tier list de la que salió esta">
+          ↰ Derivada de <b>{parent}</b>
+        </Link>
+      )}
     </div>
   );
 }

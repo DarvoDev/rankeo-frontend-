@@ -1,6 +1,6 @@
 import { HubConnectionBuilder, HubConnectionState } from '@microsoft/signalr';
 import { getName } from '../lib/storage';
-import type { ActivityEntry, Room, RoomAction } from '../types';
+import type { ActivityEntry, Presence, RemoteCursor, Room, RoomAction } from '../types';
 import { roomReducer } from './roomReducer';
 import type { RoomEvent, RoomService } from './roomService';
 
@@ -30,6 +30,7 @@ async function problem(res: Response, fallback: string): Promise<never> {
  * Salas compartidas en vivo con la API (HTTP + SignalR).
  * Los cambios propios se aplican al instante con el mismo reducer (optimista) y el estado
  * que manda el servidor los reemplaza; si el servidor los rechaza se vuelve al último confirmado.
+ * Presencia y cursores son efímeros: los manda el servidor a quien esté conectado y no se guardan.
  */
 export class SignalRRoomService implements RoomService {
   // Reintenta para siempre (cada 2, 4… hasta 10 s): con el default se rinde a los ~40 s y la pestaña queda muerta
@@ -38,6 +39,8 @@ export class SignalRRoomService implements RoomService {
     .build();
   private starting?: Promise<void>;
   private joined?: string;
+  // Sala a la que se está uniendo: `presence` llega antes de que `Unirse` devuelva
+  private joining?: string;
   private shown = new Map<string, Room>();
   private confirmed = new Map<string, ServerRoom>();
   private listeners = new Map<string, Set<(event: RoomEvent) => void>>();
@@ -46,6 +49,13 @@ export class SignalRRoomService implements RoomService {
     this.conn.on('state', (room: ServerRoom) => this.receive(room));
     this.conn.on('activity', (activity: ActivityEntry[]) => {
       if (this.joined) this.emit(this.joined, { type: 'activity', activity });
+    });
+    this.conn.on('presence', (people: Presence[]) => {
+      const code = this.joining ?? this.joined;
+      if (code) this.emit(code, { type: 'presence', people: people.map(p => ({ ...p, me: p.id === this.conn.connectionId })) });
+    });
+    this.conn.on('cursor', (cursor: RemoteCursor) => {
+      if (this.joined) this.emit(this.joined, { type: 'cursor', cursor });
     });
     this.conn.onreconnecting(() => {
       if (this.joined) this.emit(this.joined, { type: 'online', online: false });
@@ -79,6 +89,16 @@ export class SignalRRoomService implements RoomService {
     return withApi(await res.json());
   }
 
+  async derive(code: string, title: string, by: string) {
+    const res = await fetch(`${API}/api/salas/${code}/derivadas`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, apodo: by }),
+    });
+    if (!res.ok) return problem(res, 'No se pudo crear la sub-tier list.');
+    return withApi(await res.json());
+  }
+
   async load(code: string) {
     try {
       return await this.join(code);
@@ -103,14 +123,21 @@ export class SignalRRoomService implements RoomService {
     });
   }
 
-  async addImage(code: string, dataUrl: string, name: string, by: string) {
+  async addImage(code: string, dataUrl: string, name: string, by: string, caption?: string) {
     const form = new FormData();
     form.append('archivo', await (await fetch(dataUrl)).blob(), `${name}.webp`);
     form.append('nombre', name);
     form.append('apodo', by);
+    if (caption) form.append('subtitulo', caption);
     const res = await fetch(`${API}/api/salas/${code}/imagenes`, { method: 'POST', body: form });
     // La imagen nueva llega a todos (también a ti) por el evento `state`
     if (!res.ok) await problem(res, `No se pudo subir ${name}.`);
+  }
+
+  sendCursor(code: string, x: number, y: number, dragId: string | null, away: boolean) {
+    if (this.joined !== code || this.conn.state !== HubConnectionState.Connected) return;
+    // send (sin respuesta): si se pierde uno, el siguiente lo corrige
+    this.conn.send('Cursor', x, y, dragId, away).catch(() => {});
   }
 
   subscribe(code: string, listener: (event: RoomEvent) => void) {
@@ -123,11 +150,16 @@ export class SignalRRoomService implements RoomService {
     if (this.conn.state === HubConnectionState.Disconnected) {
       await (this.starting ??= this.conn.start().finally(() => { this.starting = undefined; }));
     } else await this.starting;
-    const { room, activity } = await this.conn.invoke<{ room: ServerRoom; activity: ActivityEntry[] }>('Unirse', code, getName());
-    this.joined = room.code;
-    this.confirmed.delete(room.code);
-    this.receive(room, false);
-    return { room: this.shown.get(room.code)!, activity };
+    this.joining = code;
+    try {
+      const { room, activity } = await this.conn.invoke<{ room: ServerRoom; activity: ActivityEntry[] }>('Unirse', code, getName());
+      this.joined = room.code;
+      this.confirmed.delete(room.code);
+      this.receive(room, false);
+      return { room: this.shown.get(room.code)!, activity };
+    } finally {
+      this.joining = undefined;
+    }
   }
 
   // Con escrituras simultáneas los estados pueden llegar desordenados: se descartan los viejos

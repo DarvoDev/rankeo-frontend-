@@ -64,3 +64,33 @@ Archivos exactos a tocar, en orden. Todo cambio de sala pasa por `RoomAction` (c
 
 - `IMAGE_SIZE` y calidad webp en `shrink` (`src/lib/image.ts`). La API acepta máx `IMAGEN_MAX_KB`
   (512 KB por defecto); en `DEMO42` más grande = se llena antes la cuota de `localStorage` (ver [architecture/state-management.md](architecture/state-management.md)).
+
+## Subtítulo de imagen
+
+- Dato: `Item.caption` (opcional, máx `CAPTION_MAX` = 80). Se pide en `CaptionModal` (`src/components/room/`) al
+  subir: `addImages` recorta y deja las imágenes en `pending`; `upload` llama `roomService.addImage(..., caption)`.
+- Transporte: campo `subtitulo` del multipart (`SignalRRoomService.addImage`); el backend lo valida (≤ 80) y lo
+  guarda en el `jsonb` (`ImagenService.Subir`, `SalaService.Validar`). Sin migración.
+- Vista: `title` de `ItemCard` + franja `.caption` al pasar el cursor (`ItemCard.module.css`, opacidad 0 → no
+  sale en el PNG); también en la vista ampliada.
+
+## Sub-tier list (derivar una sala)
+
+1. `deriveRoom` (`src/room/derive.ts`, puro, con test) define qué se copia: filas con ids nuevos y vacías, imágenes
+   con ids nuevos al banco en orden visual, `parent` = código origen, título dado o el del padre.
+2. `RoomService.derive(code, title, by)` → `POST /api/salas/{code}/derivadas` `{ title, apodo }` (rate limit
+   "crear"). El servidor (`SalaService.Derivar`) copia los archivos al volumen de la sala nueva.
+3. UI: botón "Sub-tier list" en `RoomPage` → `DeriveModal` → `navigate` a la sala nueva; `TopBar` enlaza al padre.
+4. `DEMO42` no se puede derivar (`roomService.derive` rechaza): sus imágenes no existen en la API.
+
+## Presencia y cursores (efímeros)
+
+- El servidor manda `presence` (lista completa `Presence[]`) a la sala al entrar/salir; `useRoom` lo expone como
+  `people` (si nunca llega, solo tú) y `Sidebar` lo pinta.
+- Tu puntero: `useCursorBroadcast(code, areaRef, enabled, dragId)` en `RoomView`, px relativos a `areaRef`
+  (tablero + banco), máx uno cada `CURSOR_INTERVAL` ms, `away` al salir de la ventana. `dragId` viene de
+  `TierBoard.onDragChange`.
+- Los demás: `useRemoteCursors` guarda el último `cursor` por conexión y descarta los de quien ya no está en
+  `people`; `CursorLayer` (absoluto dentro de `.area`, `pointer-events: none`, `EXPORT_IGNORE`) dibuja flecha,
+  apodo y la copia de la imagen arrastrada.
+- Nada de esto se guarda ni pasa por el reducer. Cambiar la frecuencia: `CURSOR_INTERVAL`.

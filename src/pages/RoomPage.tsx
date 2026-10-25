@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { CaptionModal, type CaptionedImage, type PendingImage } from '../components/room/CaptionModal';
+import { CursorLayer } from '../components/room/CursorLayer';
+import { DeriveModal } from '../components/room/DeriveModal';
 import { NameModal } from '../components/room/NameModal';
 import { RoomNotFound } from '../components/room/RoomNotFound';
 import { Sidebar } from '../components/room/Sidebar';
@@ -12,6 +15,7 @@ import { exportPng } from '../lib/exportPng';
 import { newId, normalizeCode } from '../lib/ids';
 import { shrink } from '../lib/image';
 import { getName, setName } from '../lib/storage';
+import { useCursorBroadcast } from '../room/useCursors';
 import { useImageInput } from '../room/useImageInput';
 import { roomService } from '../room/roomService';
 import { useRoom } from '../room/useRoom';
@@ -33,21 +37,37 @@ export default function RoomPage() {
 function RoomView({ code, myName }: { code: string; myName: string }) {
   const toast = useToast();
   const location = useLocation();
-  const { room, status, activity, dispatch: act } = useRoom(code, myName);
+  const navigate = useNavigate();
+  const { room, status, activity, people, dispatch: act } = useRoom(code, myName);
   const boardRef = useRef<HTMLDivElement>(null);
+  // Tablero + banco: origen de coordenadas de los punteros compartidos
+  const areaRef = useRef<HTMLDivElement>(null);
+  const [dragging, setDragging] = useState<string | null>(null);
+  // Imágenes ya recortadas que esperan su subtítulo antes de subirse
+  const [pending, setPending] = useState<PendingImage[]>([]);
+  const [deriving, setDeriving] = useState(false);
 
+  useCursorBroadcast(code, areaRef, status === 'online', dragging);
+
+  // Recorta y abre el modal de subtítulos; la subida ocurre al confirmar
   async function addImages(files: File[]) {
+    const ready: PendingImage[] = [];
     for (const file of files.filter(f => f.type.startsWith('image/'))) {
       const name = file.name.replace(/\.[^.]+$/, '').slice(0, 30) || 'Imagen';
-      let url;
       try {
-        url = await shrink(file);
+        ready.push({ url: await shrink(file), name });
       } catch {
         toast(`No se pudo leer ${file.name}`);
-        continue;
       }
+    }
+    if (ready.length) setPending(prev => [...prev, ...ready]);
+  }
+
+  async function upload(images: CaptionedImage[]) {
+    setPending([]);
+    for (const image of images) {
       try {
-        await roomService.addImage(code, url, name, myName);
+        await roomService.addImage(code, image.url, image.name, myName, image.caption || undefined);
       } catch (error) {
         toast((error as Error).message);
       }
@@ -79,6 +99,16 @@ function RoomView({ code, myName }: { code: string; myName: string }) {
     act({ type: 'tier:add', id: newId(), color: TIER_COLORS[room.tiers.length % TIER_COLORS.length] }, 'añadió una fila');
   }
 
+  async function derive(title: string) {
+    try {
+      const child = await roomService.derive(code, title, myName);
+      setDeriving(false);
+      navigate(`/sala/${child.code}`, { state: { created: true } });
+    } catch (error) {
+      toast((error as Error).message);
+    }
+  }
+
   async function download() {
     if (!boardRef.current || !room) return;
     try {
@@ -90,43 +120,64 @@ function RoomView({ code, myName }: { code: string; myName: string }) {
 
   if (status === 'missing') return <RoomNotFound code={code} />;
 
+  const total = room ? Object.keys(room.items).length : 0;
+
   return (
     <main className={styles.room}>
-      <TopBar code={code} status={status} onCopyLink={copyLink} />
+      <TopBar code={code} status={status} parent={room?.parent} onCopyLink={copyLink} />
 
       <div className={styles.layout}>
         <div>
           {room ? (
             <>
               <div className={styles.head}>
-                <EditableText
-                  as="h1"
-                  className={styles.title}
-                  value={room.title}
-                  onChange={title => act({ type: 'title:update', title })}
-                  label="Título de la tier list"
-                />
+                <div className={styles.titleGroup}>
+                  <EditableText
+                    as="h1"
+                    className={styles.title}
+                    value={room.title}
+                    onChange={title => act({ type: 'title:update', title })}
+                    label="Título de la tier list"
+                  />
+                  <span className={styles.count} aria-live="polite">
+                    {total === 1 ? '1 imagen' : `${total} imágenes`} · {room.pool.length} sin clasificar
+                  </span>
+                </div>
                 <div className={styles.actions}>
                   <button onClick={addTier}>+ Añadir fila</button>
+                  <button onClick={() => setDeriving(true)} title="Sala nueva con las mismas imágenes, sin clasificar">
+                    Sub-tier list
+                  </button>
                   <button className="btn-primary" onClick={download}>Descargar PNG</button>
                 </div>
               </div>
-              <TierBoard
-                room={room}
-                boardRef={boardRef}
-                fileOver={fileOver}
-                act={act}
-                onFiles={addImages}
-                onBlocked={toast}
-              />
+              <div ref={areaRef} className={styles.area}>
+                <TierBoard
+                  room={room}
+                  boardRef={boardRef}
+                  fileOver={fileOver}
+                  act={act}
+                  onFiles={addImages}
+                  onBlocked={toast}
+                  onDragChange={setDragging}
+                />
+                <CursorLayer code={code} people={people} items={room.items} />
+              </div>
             </>
           ) : (
             <p className={styles.loading}>Conectando con la sala…</p>
           )}
         </div>
 
-        <Sidebar activity={activity} />
+        <Sidebar activity={activity} people={people} />
       </div>
+
+      {pending.length > 0 && (
+        <CaptionModal pending={pending} onConfirm={upload} onCancel={() => setPending([])} />
+      )}
+      {deriving && room && (
+        <DeriveModal title={room.title} count={total} onConfirm={derive} onCancel={() => setDeriving(false)} />
+      )}
     </main>
   );
 }

@@ -1,19 +1,22 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useToast } from '../components/ui/toastContext';
 import { colorFor } from '../lib/ids';
-import type { ActivityEntry, Person, Room, RoomAction } from '../types';
+import type { ActivityEntry, Person, Presence, Room, RoomAction } from '../types';
 import { roomService } from './roomService';
 
 export type RoomStatus = 'connecting' | 'online' | 'missing';
 
-/** Estado de una sala: contenido y bitácora de movimientos */
+/** Estado de una sala: contenido, bitácora de movimientos y quién está conectado */
 export function useRoom(code: string, myName: string) {
   const toast = useToast();
   const [room, setRoom] = useState<Room | null>(null);
   const [status, setStatus] = useState<RoomStatus>('connecting');
   const [activity, setActivity] = useState<ActivityEntry[]>([]);
+  // Hasta que el servidor mande la lista (o si la sala es local, siempre) solo estás tú
+  const [people, setPeople] = useState<Presence[]>([]);
 
   const me = useMemo<Person>(() => ({ name: myName, color: colorFor(myName) }), [myName]);
+  const shownPeople = useMemo<Presence[]>(() => people.length ? people : [{ ...me, id: 'me', me: true }], [people, me]);
 
   useEffect(() => {
     let cancelled = false;
@@ -21,7 +24,9 @@ export function useRoom(code: string, myName: string) {
       if (event.type === 'state') setRoom(event.room);
       else if (event.type === 'activity') setActivity(event.activity);
       else if (event.type === 'online') setStatus(event.online ? 'online' : 'connecting');
-      else toast(event.message);
+      else if (event.type === 'presence') setPeople(event.people);
+      else if (event.type === 'warning') toast(event.message);
+      // 'cursor' lo consume CursorLayer por su cuenta: cambia muy seguido para pasar por aquí
     });
     let retry: number | undefined;
     const load = (first: boolean) => roomService.load(code).then(loaded => {
@@ -44,5 +49,5 @@ export function useRoom(code: string, myName: string) {
     roomService.dispatch(code, action, text ? { who: me, text } : undefined);
   }, [code, me]);
 
-  return { room, status, activity, dispatch };
+  return { room, status, activity, people: shownPeople, dispatch };
 }

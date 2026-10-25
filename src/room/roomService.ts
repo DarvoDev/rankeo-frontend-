@@ -1,7 +1,8 @@
 import { DEMO_CODE, demoRoom, newRoom } from '../lib/demo';
 import { colorFor, generateCode, newId } from '../lib/ids';
 import { loadActivity, loadRoom, saveActivity, saveRoom } from '../lib/storage';
-import type { ActivityEntry, Person, Room, RoomAction } from '../types';
+import type { ActivityEntry, Person, Presence, RemoteCursor, Room, RoomAction } from '../types';
+import { deriveRoom } from './derive';
 import { roomReducer } from './roomReducer';
 import { SignalRRoomService } from './signalrRoomService';
 
@@ -9,7 +10,11 @@ export type RoomEvent =
   | { type: 'state'; room: Room }
   | { type: 'activity'; activity: ActivityEntry[] }
   | { type: 'warning'; message: string }
-  | { type: 'online'; online: boolean };
+  | { type: 'online'; online: boolean }
+  /** Quién está conectado ahora (lista completa cada vez) */
+  | { type: 'presence'; people: Presence[] }
+  /** El puntero de otra persona se movió */
+  | { type: 'cursor'; cursor: RemoteCursor };
 
 /** Lo que queda en la bitácora junto con un cambio */
 export interface LogEntry {
@@ -25,10 +30,14 @@ export interface LogEntry {
 export interface RoomService {
   exists(code: string): Promise<boolean>;
   create(title: string): Promise<Room>;
+  /** Sub-tier list: sala nueva con las mismas filas e imágenes de `code`, todas sin clasificar */
+  derive(code: string, title: string, by: string): Promise<Room>;
   load(code: string): Promise<{ room: Room; activity: ActivityEntry[] } | null>;
   dispatch(code: string, action: RoomAction, log?: LogEntry): void;
   /** Agrega una imagen (data URL ya recortada) al final del banco */
-  addImage(code: string, dataUrl: string, name: string, by: string): Promise<void>;
+  addImage(code: string, dataUrl: string, name: string, by: string, caption?: string): Promise<void>;
+  /** Tu puntero para los demás (px relativos al tablero). Efímero: si no hay conexión se descarta */
+  sendCursor(code: string, x: number, y: number, dragId: string | null, away: boolean): void;
   subscribe(code: string, listener: (event: RoomEvent) => void): () => void;
 }
 
@@ -68,6 +77,20 @@ class LocalRoomService implements RoomService {
     return room;
   }
 
+  async derive(code: string, title: string, by: string) {
+    await wait(LOOKUP_DELAY);
+    const parent = this.get(code);
+    if (!parent) throw new Error(`No existe ninguna sala con el código ${code}.`);
+    let next;
+    do next = generateCode(); while (next === DEMO_CODE || this.get(next));
+    const room = deriveRoom(parent, next, title);
+    const activity = [{ id: newId(), at: Date.now(), who: { name: by, color: colorFor(by) }, text: `creó esta sala a partir de ${code}` }];
+    this.rooms.set(next, room);
+    this.activity.set(next, activity);
+    if (saveRoom(room)) saveActivity(next, activity);
+    return room;
+  }
+
   async load(code: string) {
     await wait(CONNECT_DELAY);
     // La sala de ejemplo siempre arranca igual; las demás se guardan en este navegador
@@ -104,10 +127,13 @@ class LocalRoomService implements RoomService {
     }
   }
 
-  async addImage(code: string, dataUrl: string, name: string, by: string) {
-    const item = { id: newId(), name, url: dataUrl, by };
+  async addImage(code: string, dataUrl: string, name: string, by: string, caption?: string) {
+    const item = { id: newId(), name, url: dataUrl, by, ...(caption ? { caption } : {}) };
     this.dispatch(code, { type: 'item:add', item }, { who: { name: by, color: colorFor(by) }, text: `subió ${name}` });
   }
+
+  // Sin otros usuarios en el navegador: no hay a quién mandarle el puntero
+  sendCursor() {}
 
   subscribe(code: string, listener: (event: RoomEvent) => void) {
     if (!this.listeners.has(code)) this.listeners.set(code, new Set());
@@ -128,8 +154,13 @@ const pick = (code: string) => code === DEMO_CODE ? local : remote;
 export const roomService: RoomService = {
   exists: code => pick(code).exists(code),
   create: title => remote.create(title),
+  // De DEMO42 no se puede derivar: sus imágenes no existen en el servidor y la sala nueva viviría en la API
+  derive: (code, title, by) => code === DEMO_CODE
+    ? Promise.reject(new Error('La sala de ejemplo no se puede derivar.'))
+    : remote.derive(code, title, by),
   load: code => pick(code).load(code),
   dispatch: (code, action, log) => pick(code).dispatch(code, action, log),
-  addImage: (code, dataUrl, name, by) => pick(code).addImage(code, dataUrl, name, by),
+  addImage: (code, dataUrl, name, by, caption) => pick(code).addImage(code, dataUrl, name, by, caption),
+  sendCursor: (code, x, y, dragId, away) => pick(code).sendCursor(code, x, y, dragId, away),
   subscribe: (code, listener) => pick(code).subscribe(code, listener),
 };

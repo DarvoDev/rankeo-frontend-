@@ -13,6 +13,7 @@ Primer destino de toda búsqueda. Regenerar la columna mecánica con `sh docs/do
 | `src/room/roomReducer.ts` | Toda mutación de una sala (puro, con tests) |
 | `src/room/roomService.ts` | Interfaz `RoomService` + `LocalRoomService` (DEMO42) + compuesto `roomService` |
 | `src/room/signalrRoomService.ts` | `SignalRRoomService`: API real (HTTP + SignalR) |
+| `src/room/useCursors.ts` | Punteros compartidos: `useCursorBroadcast` (mandar el tuyo) y `useRemoteCursors` (ver los demás) |
 | `src/pages/RoomPage.tsx` | Pantalla de la sala: une hook, tablero, subida de imágenes, PNG |
 | `src/components/room/TierBoard.tsx` | Drag & drop completo (dnd-kit), papelera, teclado |
 | `src/lib/demo.ts` | Sala nueva por defecto, sala `DEMO42`, `MAX_TIERS`, `TIER_COLORS` |
@@ -24,18 +25,21 @@ Primer destino de toda búsqueda. Regenerar la columna mecánica con `sh docs/do
 | Símbolo | Archivo | Qué hace |
 |---|---|---|
 | `POOL` | `src/types.ts` | Id `'pool'` del banco de imágenes sin clasificar |
-| `Item`, `Tier`, `Room`, `Person`, `ActivityEntry` | `src/types.ts` | |
+| `Item`, `Tier`, `Room`, `Person`, `ActivityEntry` | `src/types.ts` | `Item.caption` (subtítulo), `Room.parent` (sala de origen) |
+| `Presence`, `RemoteCursor` | `src/types.ts` | Persona conectada (`id` = conexión, `me`) y puntero de otra persona (px relativos al tablero, `dragId`, `away`) |
 | `RoomAction` | `src/types.ts` | Unión de las 9 acciones (`item:*`, `tier:*`, `title:update`) |
 | `roomReducer` | `src/room/roomReducer.ts` | Aplica una `RoomAction`; devuelve la misma referencia si no aplica |
 | `listOf` | `src/room/roomReducer.ts` | Lista de ids de un contenedor (fila o `POOL`) |
 | `containerOf` | `src/room/roomReducer.ts` | Contenedor donde está una imagen |
-| `RoomService` | `src/room/roomService.ts` | Contrato `exists/create/load/dispatch/addImage/subscribe` |
-| `RoomEvent` | `src/room/roomService.ts` | Eventos `state` / `activity` / `warning` / `online` |
+| `RoomService` | `src/room/roomService.ts` | Contrato `exists/create/derive/load/dispatch/addImage/sendCursor/subscribe` |
+| `RoomEvent` | `src/room/roomService.ts` | Eventos `state` / `activity` / `warning` / `online` / `presence` / `cursor` |
+| `deriveRoom` | `src/room/derive.ts` | Sub-tier list pura: mismas filas (vacías, ids nuevos) e imágenes (ids nuevos) en el banco; `parent` = sala origen |
 | `LogEntry` | `src/room/roomService.ts` | `{who, text}` que acompaña un cambio en la bitácora |
 | `roomService` | `src/room/roomService.ts` | Compuesto: `DEMO42` → `LocalRoomService`, resto → `SignalRRoomService` |
 | `SignalRRoomService` | `src/room/signalrRoomService.ts` | Optimista + `version`; `withApi` (URLs de imagen), `hubMessage` |
 | `VITE_API_URL` | `src/room/signalrRoomService.ts` | URL base de la API (`.env`) |
-| `useRoom` | `src/room/useRoom.ts` | Estado de sala + bitácora + `dispatch(action, text?)` |
+| `useRoom` | `src/room/useRoom.ts` | Estado de sala + bitácora + `people` (conectados) + `dispatch(action, text?)` |
+| `useCursorBroadcast`, `useRemoteCursors`, `CURSOR_INTERVAL` | `src/room/useCursors.ts` | Manda tu puntero (≤ 25/s, con `dragId`) / lista los punteros de los demás que siguen conectados |
 | `RoomStatus` | `src/room/useRoom.ts` | `'connecting' \| 'online' \| 'missing'` |
 | `useImageInput` | `src/room/useImageInput.ts` | Drop de archivos en toda la ventana + Ctrl+V |
 
@@ -68,11 +72,14 @@ Primer destino de toda búsqueda. Regenerar la columna mecánica con `sh docs/do
 | `TierBoard` | `src/components/room/TierBoard.tsx` | `DndContext` del tablero |
 | `TierRow`, `TierMenu` | `src/components/room/` | Fila y su menú ⚙ (color, slider de brillo `glow` 0–3) |
 | `DropZone` | `src/components/room/DropZone.tsx` | Contenedor ordenable (fila o banco) |
-| `ItemCard`, `SortableItem` | `src/components/room/ItemCard.tsx` | Imagen; versión arrastrable; doble clic = vista ampliada (`Modal`) |
+| `ItemCard`, `SortableItem` | `src/components/room/ItemCard.tsx` | Imagen; `title` y franja `.caption` al pasar el cursor; doble clic = vista ampliada (`Modal`) con subtítulo |
 | `Bank` | `src/components/room/Bank.tsx` | Banco + botón "Subir imágenes" |
 | `Trash`, `TRASH` | `src/components/room/Trash.tsx` | Papelera droppable (solo ratón/táctil) |
-| `Sidebar` | `src/components/room/Sidebar.tsx` | Bitácora |
-| `TopBar`, `NameModal`, `RoomNotFound` | `src/components/room/` | |
+| `Sidebar` | `src/components/room/Sidebar.tsx` | Conectados (`people`) + bitácora |
+| `CursorLayer` | `src/components/room/CursorLayer.tsx` | Punteros de los demás sobre el tablero (flecha + apodo + copia de la imagen que arrastran) |
+| `CaptionModal`, `PendingImage`, `CaptionedImage`, `CAPTION_MAX` | `src/components/room/CaptionModal.tsx` | Pide nombre y subtítulo de cada imagen antes de subirla |
+| `DeriveModal` | `src/components/room/DeriveModal.tsx` | Título de la sub-tier list → `roomService.derive` |
+| `TopBar`, `NameModal`, `RoomNotFound` | `src/components/room/` | `TopBar` enlaza a `room.parent` ("Derivada de") |
 | `Modal`, `EditableText` | `src/components/ui/` | Primitivos propios |
 | `ToastProvider`, `ToastContext`, `useToast` | `src/components/ui/Toast.tsx`, `toastContext.ts` | Toast global |
 
@@ -88,7 +95,12 @@ Primer destino de toda búsqueda. Regenerar la columna mecánica con `sh docs/do
 | Mover imagen entre filas | `TierBoard` (`onDragOver`/`onDragEnd`) → acción `item:move` en `roomReducer` |
 | Eliminar imagen | `Trash` (arrastre) o Supr/Retroceso (`onKeyDown` en `TierBoard`) → `item:delete` |
 | Drag con teclado / lector de pantalla | `keyboardCoordinates`, `announcements`, `collisionDetection` en `TierBoard` |
-| Subir / pegar / soltar imágenes | `Bank` (input), `useImageInput` (ventana), `addImages` en `RoomPage`, `shrink` |
+| Subir / pegar / soltar imágenes | `Bank` (input), `useImageInput` (ventana), `addImages` → `pending` → `CaptionModal` → `upload` en `RoomPage`, `shrink` |
+| Subtítulo de imagen | `CaptionModal` al subir → `addImage(..., caption)` (`subtitulo` en el multipart) → `Item.caption`; tooltip y franja en `ItemCard` |
+| Contador de imágenes | `.count` en `RoomPage` (total · sin clasificar) y `<small>` en `Bank` |
+| Sub-tier list (derivar sala) | botón "Sub-tier list" → `DeriveModal` → `roomService.derive` → `POST /api/salas/{code}/derivadas`; `deriveRoom` es la versión pura; `TopBar` muestra `parent` |
+| Usuarios conectados | evento `presence` → `useRoom().people` → `Sidebar` ("Conectados"); el servidor manda la lista completa al entrar/salir |
+| Cursores en vivo / arrastre en vivo | `useCursorBroadcast` (en `RoomView`, área = `areaRef`) → `sendCursor` → hub `Cursor` → evento `cursor` → `useRemoteCursors` → `CursorLayer`; `TierBoard.onDragChange` da el `dragId` |
 | Filas: añadir, color, brillo, subir/bajar, vaciar, borrar | `addTier` en `RoomPage`; `TierMenu`; casos `tier:*` en `roomReducer` |
 | Límite de filas / mínimo una fila | `MAX_TIERS`; `tier:add` y `tier:delete` en `roomReducer` |
 | Título editable | `EditableText` en `RoomPage` → `title:update` |

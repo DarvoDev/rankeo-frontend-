@@ -18,7 +18,7 @@ export function Bank({ ids, items, fileOver, onFiles }: Props) {
   return (
     <section className={cx(styles.bank, fileOver && styles.fileOver)}>
       <div className={styles.head}>
-        <h2>Imágenes sin clasificar</h2>
+        <h2>Imágenes sin clasificar <small>{ids.length}</small></h2>
         <button className="btn-primary" onClick={() => inputRef.current?.click()}>Subir imágenes</button>
         <input
           ref={inputRef}

@@ -1,4 +1,4 @@
-import type { ActivityEntry } from '../../types';
+import type { ActivityEntry, Presence } from '../../types';
 import styles from './Sidebar.module.css';
 
 const timeFormat = new Intl.DateTimeFormat('es', { hour: '2-digit', minute: '2-digit' });
@@ -10,10 +10,29 @@ function when(at: number) {
   return (sameDay ? timeFormat : dateTimeFormat).format(at);
 }
 
-/** Bitácora de la sala: quién movió, subió o eliminó qué */
-export function Sidebar({ activity }: { activity: ActivityEntry[] }) {
+interface Props {
+  activity: ActivityEntry[];
+  /** Quién está conectado ahora mismo */
+  people: Presence[];
+}
+
+/** Lateral de la sala: conectados y bitácora (quién movió, subió o eliminó qué) */
+export function Sidebar({ activity, people }: Props) {
   return (
     <aside className={styles.side}>
+      <section className={styles.card}>
+        <h3>Conectados <small>{people.length}</small></h3>
+        <ul className={styles.people} aria-label="Personas conectadas">
+          {people.map(p => (
+            <li key={p.id}>
+              <span className={styles.dot} style={{ background: p.color }} />
+              <span className={styles.person}>{p.name}</span>
+              {p.me && <small>tú</small>}
+            </li>
+          ))}
+        </ul>
+      </section>
+
       <section className={styles.card}>
         <h3>Bitácora <small>{activity.length} movimientos</small></h3>
         <ol className={styles.feed}>

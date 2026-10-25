@@ -11,6 +11,17 @@
 }
 .card h3 small { color: var(--muted); font-weight: 400; }
 
+/* Conectados */
+.people {
+  list-style: none; padding: 0; margin: 0;
+  display: grid; gap: 8px;
+  max-height: 30vh; overflow: auto;
+  font-size: .86rem;
+}
+.people li { display: flex; gap: 8px; align-items: center; animation: fadein .4s; }
+.person { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.people small { color: var(--muted); font-size: .75rem; }
+
 .feed {
   list-style: none; padding: 0; margin: 0;
   display: grid; gap: 10px;
@@ -28,5 +39,5 @@
   .side { position: static; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .feed li { animation: none; }
+  .feed li, .people li { animation: none; }
 }

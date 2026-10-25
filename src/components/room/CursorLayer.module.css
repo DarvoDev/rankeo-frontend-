@@ -1,0 +1,29 @@
+/* Capa sobre el tablero: se recorta a su área y deja pasar el ratón */
+.layer {
+  position: absolute; inset: 0; z-index: 40;
+  overflow: hidden; pointer-events: none;
+}
+.cursor {
+  position: absolute; top: 0; left: 0;
+  will-change: transform;
+  transition: transform 60ms linear;
+}
+.arrow { display: block; filter: drop-shadow(0 1px 2px rgba(0,0,0,.6)); }
+.name {
+  position: absolute; top: 20px; left: 12px;
+  padding: 2px 7px; border-radius: 999px;
+  font-size: .72rem; font-weight: 600; color: #111;
+  white-space: nowrap; box-shadow: 0 1px 3px rgba(0,0,0,.5);
+}
+/* Copia de la imagen que la otra persona arrastra, centrada en su puntero */
+.ghost {
+  position: absolute;
+  left: calc(var(--cell) / -2); top: calc(var(--cell) / -2);
+  opacity: .75; cursor: default;
+  outline: 3px solid; outline-offset: -3px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.6);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cursor { transition: none; }
+}

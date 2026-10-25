@@ -16,16 +16,26 @@ interface ItemCardProps extends HTMLAttributes<HTMLDivElement> {
   ref?: Ref<HTMLDivElement>;
 }
 
+/** Texto del tooltip nativo: nombre, subtítulo y quién la subió */
+function tooltip(item: Item) {
+  const parts = [item.name];
+  if (item.caption) parts.push(item.caption);
+  if (item.by) parts.push(`subida por ${item.by}`);
+  return `${parts.join(' · ')} (doble clic para ampliar)`;
+}
+
 export function ItemCard({ item, placeholder, overlay, ref, className, ...rest }: ItemCardProps) {
   return (
     <div
       ref={ref}
       className={cx(styles.item, placeholder && styles.placeholder, overlay && styles.overlay, className)}
-      title={`${item.by ? `${item.name} · subida por ${item.by}` : item.name} (doble clic para ampliar)`}
+      title={tooltip(item)}
       {...rest}
     >
       {/* crossOrigin: las imágenes de la API vienen de otro origen y el PNG las necesita sin "tainted" */}
       <img src={item.url} alt={item.name} draggable={false} crossOrigin="anonymous" />
+      {/* Subtítulo al pasar el cursor; invisible en el PNG (opacidad 0 sin hover) */}
+      {item.caption && !placeholder && !overlay && <span className={styles.caption}>{item.caption}</span>}
     </div>
   );
 }
@@ -50,8 +60,14 @@ export function SortableItem({ item }: { item: Item }) {
     />
     {/* Portal: el transform de dnd-kit rompería el position: fixed del modal */}
     {zoomed && createPortal(
-      <Modal title={item.by ? `${item.name} · ${item.by}` : item.name} onClose={() => setZoomed(false)} className={styles.zoom}>
+      <Modal title={item.name} onClose={() => setZoomed(false)} className={styles.zoom}>
         <img src={item.url} alt={item.name} />
+        {(item.caption || item.by) && (
+          <p className={styles.zoomMeta}>
+            {item.caption && <span>{item.caption}</span>}
+            {item.by && <small>subida por {item.by}</small>}
+          </p>
+        )}
       </Modal>,
       document.body,
     )}
