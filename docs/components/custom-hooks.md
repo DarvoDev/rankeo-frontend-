@@ -9,7 +9,9 @@ Todos en uso; ninguno legado.
 
 - Al montar: `roomService.subscribe(code, …)` y luego `roomService.load(code)`.
 - `status`: `'connecting'` → `'online'` si `load` trae sala, `'missing'` si no.
-- Si `load` falla (red, API caída): toast "No se pudo conectar con la sala." y se queda en `connecting`.
+- Si `load` falla (red, API caída): toast "No se pudo conectar con la sala." (solo la primera vez) y
+  reintenta cada 3 s hasta que responda.
+- Evento `online` (reconexión de SignalR) → `status` `'connecting'` / `'online'`.
 - `dispatch(action, text?)`: con `text` agrega `{ who: me, text }` a la bitácora.
 - `me = { name: myName, color: colorFor(myName) }`.
 - Eventos `warning` → `toast`.

@@ -32,7 +32,10 @@ async function problem(res: Response, fallback: string): Promise<never> {
  * que manda el servidor los reemplaza; si el servidor los rechaza se vuelve al último confirmado.
  */
 export class SignalRRoomService implements RoomService {
-  private conn = new HubConnectionBuilder().withUrl(`${API}/hubs/sala`).withAutomaticReconnect().build();
+  // Reintenta para siempre (cada 2, 4… hasta 10 s): con el default se rinde a los ~40 s y la pestaña queda muerta
+  private conn = new HubConnectionBuilder().withUrl(`${API}/hubs/sala`)
+    .withAutomaticReconnect({ nextRetryDelayInMilliseconds: ({ previousRetryCount }) => Math.min(previousRetryCount * 2000, 10000) })
+    .build();
   private starting?: Promise<void>;
   private joined?: string;
   private shown = new Map<string, Room>();
@@ -44,6 +47,9 @@ export class SignalRRoomService implements RoomService {
     this.conn.on('activity', (activity: ActivityEntry[]) => {
       if (this.joined) this.emit(this.joined, { type: 'activity', activity });
     });
+    this.conn.onreconnecting(() => {
+      if (this.joined) this.emit(this.joined, { type: 'online', online: false });
+    });
     // Los grupos de SignalR no sobreviven a la reconexión: hay que volver a unirse
     this.conn.onreconnected(() => {
       const code = this.joined;
@@ -51,6 +57,7 @@ export class SignalRRoomService implements RoomService {
       this.join(code).then(({ room, activity }) => {
         this.emit(code, { type: 'state', room });
         this.emit(code, { type: 'activity', activity });
+        this.emit(code, { type: 'online', online: true });
       }, () => this.emit(code, { type: 'warning', message: 'No se pudo reconectar con la sala.' }));
     });
   }

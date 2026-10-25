@@ -8,7 +8,8 @@ import { SignalRRoomService } from './signalrRoomService';
 export type RoomEvent =
   | { type: 'state'; room: Room }
   | { type: 'activity'; activity: ActivityEntry[] }
-  | { type: 'warning'; message: string };
+  | { type: 'warning'; message: string }
+  | { type: 'online'; online: boolean };
 
 /** Lo que queda en la bitácora junto con un cambio */
 export interface LogEntry {

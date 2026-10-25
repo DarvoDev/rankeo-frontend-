@@ -1,8 +1,18 @@
-<!-- fuente: README.md, package.json, vite.config.ts, src/App.tsx | rev: 0ed1e18 -->
+<!-- fuente: README.md, package.json, vite.config.ts, src/App.tsx, Dockerfile, nginx.conf | rev: 0ed1e18 -->
 # Despliegue
 
-No hay `Dockerfile`, `docker-compose`, CI ni config de hosting (Vercel/Netlify/nginx) en el repo.
-`[TODO: confirmar dónde y cómo se despliega]`
+## Docker
+
+`Dockerfile` multi-stage: `node:22-alpine` compila (`npm ci` + `npm run build`) y `nginx:1.27-alpine`
+sirve `dist/` con `nginx.conf` (toda ruta cae en `index.html`; `/assets/` con caché `immutable`).
+
+```bash
+docker build --build-arg VITE_API_URL=https://api.ejemplo.com -t rankeo-frontend .
+docker run -d -p 5174:80 rankeo-frontend
+```
+
+`VITE_API_URL` es `ARG` de build (default `http://localhost:8088`): cambiarla obliga a reconstruir.
+Sin CI ni `docker-compose` en este repo.
 
 ## Lo que sí se sabe
 

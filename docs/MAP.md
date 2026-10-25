@@ -30,7 +30,7 @@ Primer destino de toda búsqueda. Regenerar la columna mecánica con `sh docs/do
 | `listOf` | `src/room/roomReducer.ts` | Lista de ids de un contenedor (fila o `POOL`) |
 | `containerOf` | `src/room/roomReducer.ts` | Contenedor donde está una imagen |
 | `RoomService` | `src/room/roomService.ts` | Contrato `exists/create/load/dispatch/addImage/subscribe` |
-| `RoomEvent` | `src/room/roomService.ts` | Eventos `state` / `activity` / `warning` |
+| `RoomEvent` | `src/room/roomService.ts` | Eventos `state` / `activity` / `warning` / `online` |
 | `LogEntry` | `src/room/roomService.ts` | `{who, text}` que acompaña un cambio en la bitácora |
 | `roomService` | `src/room/roomService.ts` | Compuesto: `DEMO42` → `LocalRoomService`, resto → `SignalRRoomService` |
 | `SignalRRoomService` | `src/room/signalrRoomService.ts` | Optimista + `version`; `withApi` (URLs de imagen), `hubMessage` |

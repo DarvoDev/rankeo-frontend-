@@ -20,15 +20,23 @@ export function useRoom(code: string, myName: string) {
     const unsubscribe = roomService.subscribe(code, event => {
       if (event.type === 'state') setRoom(event.room);
       else if (event.type === 'activity') setActivity(event.activity);
+      else if (event.type === 'online') setStatus(event.online ? 'online' : 'connecting');
       else toast(event.message);
     });
-    roomService.load(code).then(loaded => {
+    let retry: number | undefined;
+    const load = (first: boolean) => roomService.load(code).then(loaded => {
       if (cancelled) return;
       setRoom(loaded?.room ?? null);
       setActivity(loaded?.activity ?? []);
       setStatus(loaded ? 'online' : 'missing');
-    }, () => { if (!cancelled) toast('No se pudo conectar con la sala.'); });
-    return () => { cancelled = true; unsubscribe(); };
+    }, () => {
+      if (cancelled) return;
+      if (first) toast('No se pudo conectar con la sala.');
+      // Sin conexión (API caída o sin red): reintenta hasta que responda
+      retry = window.setTimeout(() => load(false), 3000);
+    });
+    load(true);
+    return () => { cancelled = true; clearTimeout(retry); unsubscribe(); };
   }, [code, toast]);
 
   /** Aplica un cambio tuyo; con texto queda en la bitácora a tu nombre */

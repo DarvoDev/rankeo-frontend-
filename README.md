@@ -19,6 +19,13 @@ npm test          # pruebas del reducer (Vitest)
 npm run lint      # oxlint
 ```
 
+Docker (nginx con fallback de SPA; `VITE_API_URL` se fija al construir):
+
+```bash
+docker build --build-arg VITE_API_URL=http://localhost:8088 -t rankeo-frontend .
+docker run -d -p 5174:80 rankeo-frontend
+```
+
 ## Estructura
 
 ```

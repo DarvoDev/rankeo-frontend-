@@ -23,7 +23,7 @@ compuesto que elige implementación por código:
 | `subscribe` | `(code, listener) => unsubscribe` | `useRoom` | eventos `state` / `activity` del hub |
 
 `RoomEvent`: `state` (`room`) → `setRoom`; `activity` (lista completa, últimas 100) → `setActivity`;
-`warning` (`message`) → `toast`.
+`warning` (`message`) → `toast`; `online` (`online`) → `status` `'online'` / `'connecting'` (solo SignalR).
 
 ## SignalRRoomService
 
@@ -35,10 +35,12 @@ compuesto que elige implementación por código:
 - **Bitácora:** el `log` de `dispatch` se ignora; texto, autor y color los calcula el servidor.
 - **Imágenes:** `addImage` sube el data URL ya recortado como blob; la imagen llega a todos (también a
   quien la subió) por `state`. URLs relativas `/imagenes/...` → se les antepone `VITE_API_URL` en `withApi`.
-- **Reconexión:** `withAutomaticReconnect`; en `onreconnected` vuelve a `Unirse` (los grupos de
-  SignalR no sobreviven) y re-emite `state` + `activity`.
+- **Reconexión:** `withAutomaticReconnect` con reintentos sin fin (2 s, 4 s… tope 10 s; el default se
+  rinde a los ~40 s y la pestaña quedaba muerta). `onreconnecting` emite `online: false` (TopBar muestra
+  "Conectando…"); `onreconnected` vuelve a `Unirse` (los grupos de SignalR no sobreviven), re-emite
+  `state` + `activity` y `online: true`.
 - **Errores:** `load` devuelve `null` si el hub responde con error de regla (sala inexistente);
-  error de red → rechaza y `useRoom` muestra "No se pudo conectar con la sala.".
+  error de red → rechaza; `useRoom` muestra "No se pudo conectar con la sala." y reintenta `load` cada 3 s.
 - Una sola conexión por pestaña; al cambiar de sala `Unirse` cambia de grupo en el servidor.
 
 > ⚠️ Exportar PNG con imágenes de la API requiere CORS: `crossOrigin="anonymous"` en `ItemCard` y
