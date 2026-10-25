@@ -25,7 +25,7 @@ Sin dependencias de React. `storage.ts` en [state-management.md](../architecture
 
 ## image.ts
 
-`shrink(file)` — recorta al centro en cuadrado, reduce a `IMAGE_SIZE = 768` px (no amplía
+`shrink(file)` — encaja la imagen completa en un cuadrado con franjas negras, `IMAGE_SIZE = 768` px (no amplía
 imágenes más chicas) y devuelve `data:image/webp` calidad 0.85. Lanza si el archivo no decodifica.
 
 ## exportPng.ts

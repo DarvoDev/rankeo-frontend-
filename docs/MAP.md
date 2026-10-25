@@ -52,7 +52,7 @@ Primer destino de toda búsqueda. Regenerar la columna mecánica con `sh docs/do
 | `generateCode` | `src/lib/ids.ts` | Código de sala de 6 chars sin 0/O/1/I |
 | `normalizeCode` | `src/lib/ids.ts` | Mayúsculas, quita todo lo no `A-Z0-9` |
 | `colorFor` | `src/lib/ids.ts` | Color HSL estable a partir de un nombre |
-| `shrink` | `src/lib/image.ts` | Recorte cuadrado 768px → data URL webp |
+| `shrink` | `src/lib/image.ts` | Imagen completa en cuadrado 768px con franjas negras → data URL webp |
 | `getName`, `setName` | `src/lib/storage.ts` | Apodo en `localStorage` |
 | `loadRoom`, `saveRoom`, `loadActivity`, `saveActivity` | `src/lib/storage.ts` | Persistencia en `localStorage` (nunca lanzan) |
 
