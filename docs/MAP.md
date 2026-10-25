@@ -11,7 +11,8 @@ Primer destino de toda búsqueda. Regenerar la columna mecánica con `sh docs/do
 | `src/App.tsx` | Router (`/`, `/sala/:codigo`, `*` → `/`) + `ToastProvider` |
 | `src/types.ts` | Modelo: `Room`, `Tier`, `Item`, `RoomAction`, `ActivityEntry`, `POOL` |
 | `src/room/roomReducer.ts` | Toda mutación de una sala (puro, con tests) |
-| `src/room/roomService.ts` | "El servidor": interfaz `RoomService` + `LocalRoomService` |
+| `src/room/roomService.ts` | Interfaz `RoomService` + `LocalRoomService` (DEMO42) + compuesto `roomService` |
+| `src/room/signalrRoomService.ts` | `SignalRRoomService`: API real (HTTP + SignalR) |
 | `src/pages/RoomPage.tsx` | Pantalla de la sala: une hook, tablero, subida de imágenes, PNG |
 | `src/components/room/TierBoard.tsx` | Drag & drop completo (dnd-kit), papelera, teclado |
 | `src/lib/demo.ts` | Sala nueva por defecto, sala `DEMO42`, `MAX_TIERS`, `TIER_COLORS` |
@@ -28,10 +29,12 @@ Primer destino de toda búsqueda. Regenerar la columna mecánica con `sh docs/do
 | `roomReducer` | `src/room/roomReducer.ts` | Aplica una `RoomAction`; devuelve la misma referencia si no aplica |
 | `listOf` | `src/room/roomReducer.ts` | Lista de ids de un contenedor (fila o `POOL`) |
 | `containerOf` | `src/room/roomReducer.ts` | Contenedor donde está una imagen |
-| `RoomService` | `src/room/roomService.ts` | Contrato `exists/create/load/dispatch/subscribe` |
+| `RoomService` | `src/room/roomService.ts` | Contrato `exists/create/load/dispatch/addImage/subscribe` |
 | `RoomEvent` | `src/room/roomService.ts` | Eventos `state` / `activity` / `warning` |
 | `LogEntry` | `src/room/roomService.ts` | `{who, text}` que acompaña un cambio en la bitácora |
-| `roomService` | `src/room/roomService.ts` | Singleton; hoy `new LocalRoomService()` |
+| `roomService` | `src/room/roomService.ts` | Compuesto: `DEMO42` → `LocalRoomService`, resto → `SignalRRoomService` |
+| `SignalRRoomService` | `src/room/signalrRoomService.ts` | Optimista + `version`; `withApi` (URLs de imagen), `hubMessage` |
+| `VITE_API_URL` | `src/room/signalrRoomService.ts` | URL base de la API (`.env`) |
 | `useRoom` | `src/room/useRoom.ts` | Estado de sala + bitácora + `dispatch(action, text?)` |
 | `RoomStatus` | `src/room/useRoom.ts` | `'connecting' \| 'online' \| 'missing'` |
 | `useImageInput` | `src/room/useImageInput.ts` | Drop de archivos en toda la ventana + Ctrl+V |
@@ -77,7 +80,7 @@ Primer destino de toda búsqueda. Regenerar la columna mecánica con `sh docs/do
 
 | Concepto | Dónde vive |
 |---|---|
-| Crear sala | `Hero` (`create`) → `roomService.create` → `newRoom` |
+| Crear sala | `Hero` (`create`) → `roomService.create` → `POST /api/salas` |
 | Unirse con código | `JoinModal` → `roomService.exists`; `normalizeCode` |
 | Código de sala (formato, colisiones) | `generateCode` en `src/lib/ids.ts`; bucle en `LocalRoomService.create` |
 | Sala de ejemplo / demo | `demoRoom`, `DEMO_CODE` en `src/lib/demo.ts`; caso especial en `LocalRoomService.load` |
@@ -91,7 +94,7 @@ Primer destino de toda búsqueda. Regenerar la columna mecánica con `sh docs/do
 | Título editable | `EditableText` en `RoomPage` → `title:update` |
 | Bitácora de movimientos | texto en cada `act(..., text)`; `LocalRoomService.dispatch` (máx 100); `Sidebar` |
 | Persistencia en navegador / cuota llena | `src/lib/storage.ts`; evento `warning` en `LocalRoomService.dispatch` |
-| Retrasos falsos de "servidor" | `LOOKUP_DELAY`, `CONNECT_DELAY` en `src/room/roomService.ts` |
+| Retrasos falsos (solo DEMO42) | `LOOKUP_DELAY`, `CONNECT_DELAY` en `src/room/roomService.ts` |
 | Conectar backend real | [architecture/data-layer.md](architecture/data-layer.md) |
 | Exportar PNG | `download` en `RoomPage` → `exportPng`; `EXPORT_IGNORE` en `TierRow` |
 | Copiar enlace | `copyLink` en `RoomPage` |

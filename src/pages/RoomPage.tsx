@@ -13,6 +13,7 @@ import { newId, normalizeCode } from '../lib/ids';
 import { shrink } from '../lib/image';
 import { getName, setName } from '../lib/storage';
 import { useImageInput } from '../room/useImageInput';
+import { roomService } from '../room/roomService';
 import { useRoom } from '../room/useRoom';
 import styles from './RoomPage.module.css';
 
@@ -37,11 +38,18 @@ function RoomView({ code, myName }: { code: string; myName: string }) {
 
   async function addImages(files: File[]) {
     for (const file of files.filter(f => f.type.startsWith('image/'))) {
+      const name = file.name.replace(/\.[^.]+$/, '').slice(0, 30) || 'Imagen';
+      let url;
       try {
-        const name = file.name.replace(/\.[^.]+$/, '').slice(0, 30) || 'Imagen';
-        act({ type: 'item:add', item: { id: newId(), name, url: await shrink(file), by: myName } }, `subió ${name}`);
+        url = await shrink(file);
       } catch {
         toast(`No se pudo leer ${file.name}`);
+        continue;
+      }
+      try {
+        await roomService.addImage(code, url, name, myName);
+      } catch (error) {
+        toast((error as Error).message);
       }
     }
   }

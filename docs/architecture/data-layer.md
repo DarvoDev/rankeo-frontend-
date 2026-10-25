@@ -1,49 +1,47 @@
-<!-- fuente: src/room/roomService.ts, src/room/useRoom.ts, README.md | rev: 2aee52f -->
+<!-- fuente: src/room/roomService.ts, src/room/signalrRoomService.ts, src/room/useRoom.ts | rev: 90862b9 -->
 # Capa de datos — `RoomService`
 
-No hay llamadas HTTP, WebSocket ni API routes. La "API" es la interfaz `RoomService` en
-`src/room/roomService.ts`; la única implementación es `LocalRoomService` (navegador).
+La UI solo habla con la interfaz `RoomService` (`src/room/roomService.ts`). `roomService` es un
+compuesto que elige implementación por código:
+
+| Código | Implementación | Dónde vive la sala |
+|---|---|---|
+| `DEMO42` | `LocalRoomService` (`roomService.ts`) | Memoria del navegador; se regenera al cargar, nunca se guarda |
+| cualquier otro | `SignalRRoomService` (`signalrRoomService.ts`) | API Rankeo (`rankeo-backend`): HTTP + SignalR `/hubs/sala` |
+
+`create` siempre va a la API. La API se configura con `VITE_API_URL` (sin `/` final).
 
 ## Contrato
 
-| Método | Firma | Quién lo usa |
-|---|---|---|
-| `exists` | `(code) => Promise<boolean>` | `JoinModal` |
-| `create` | `(title) => Promise<Room>` | `Hero` |
-| `load` | `(code) => Promise<{ room, activity } \| null>` | `useRoom` |
-| `dispatch` | `(code, action, log?) => void` | `useRoom.dispatch` |
-| `subscribe` | `(code, listener) => unsubscribe` | `useRoom` |
+| Método | Firma | Quién lo usa | SignalR |
+|---|---|---|---|
+| `exists` | `(code) => Promise<boolean>` | `JoinModal` | `GET /api/salas/{code}` → 204/404 |
+| `create` | `(title) => Promise<Room>` | `Hero` | `POST /api/salas` |
+| `load` | `(code) => Promise<{ room, activity } \| null>` | `useRoom` | conecta + `invoke('Unirse', code, apodo)` |
+| `dispatch` | `(code, action, log?) => void` | `useRoom.dispatch` | optimista + `invoke('Despachar', action)` |
+| `addImage` | `(code, dataUrl, name, by) => Promise<void>` | `RoomPage.addImages` | `POST /api/salas/{code}/imagenes` (multipart) |
+| `subscribe` | `(code, listener) => unsubscribe` | `useRoom` | eventos `state` / `activity` del hub |
 
-`RoomEvent` que recibe `listener`:
+`RoomEvent`: `state` (`room`) → `setRoom`; `activity` (lista completa, últimas 100) → `setActivity`;
+`warning` (`message`) → `toast`.
 
-| `type` | Payload | Efecto en `useRoom` |
-|---|---|---|
-| `state` | `room: Room` | `setRoom` |
-| `activity` | `activity: ActivityEntry[]` (lista completa) | `setActivity` |
-| `warning` | `message: string` | `toast(message)` |
+## SignalRRoomService
 
-`LogEntry = { who: Person, text }`; `useRoom` lo arma con `{ name: myName, color: colorFor(myName) }`.
+- **Optimista:** `dispatch` aplica `roomReducer` local y emite `state` al instante; el `state` del
+  servidor lo reemplaza. Si el hub rechaza la acción (`HubException`) vuelve al último estado
+  confirmado y emite `warning` con el mensaje del servidor.
+- **`version`:** cada `state` del servidor trae `version`; los más viejos que el confirmado se descartan
+  (estados desordenados con escrituras simultáneas).
+- **Bitácora:** el `log` de `dispatch` se ignora; texto, autor y color los calcula el servidor.
+- **Imágenes:** `addImage` sube el data URL ya recortado como blob; la imagen llega a todos (también a
+  quien la subió) por `state`. URLs relativas `/imagenes/...` → se les antepone `VITE_API_URL` en `withApi`.
+- **Reconexión:** `withAutomaticReconnect`; en `onreconnected` vuelve a `Unirse` (los grupos de
+  SignalR no sobreviven) y re-emite `state` + `activity`.
+- **Errores:** `load` devuelve `null` si el hub responde con error de regla (sala inexistente);
+  error de red → rechaza y `useRoom` muestra "No se pudo conectar con la sala.".
+- Una sola conexión por pestaña; al cambiar de sala `Unirse` cambia de grupo en el servidor.
 
-## Conectar un backend
+> ⚠️ Exportar PNG con imágenes de la API requiere CORS: `crossOrigin="anonymous"` en `ItemCard` y
+> `useCORS: true` en `exportPng`. La API sirve `/imagenes` con CORS para los orígenes de `CORS_ORIGINS`.
 
-1. Implementar `RoomService` (p. ej. WebSockets); cambiar `export const roomService`.
-2. Cambios de otros usuarios → emitir `state`/`activity` por `subscribe`.
-
-Gotchas que la implementación actual oculta:
-
-> ⚠️ `dispatch` devuelve `void` y la UI **no aplica cambios optimistas**: solo se re-renderiza
-> cuando llega `state`. `LocalRoomService` lo emite síncrono; un backend real con latencia hará
-> que cada arrastre "rebote" hasta que responda el servidor, salvo que el servicio aplique
-> `roomReducer` localmente antes de enviar.
-
-> ⚠️ `useRoom` se suscribe **antes** de `load` y `load` sobrescribe `room`/`activity` al resolver:
-> un `state` que llegue entre ambos se pierde si `load` trae datos más viejos.
-
-> ⚠️ `create` en local evita colisiones probando códigos contra `localStorage`; con backend la
-> unicidad del código debe decidirla el servidor.
-
-- `RoomStatus` solo tiene `connecting | online | missing`: no hay estado de desconexión/error de
-  red. `TopBar` muestra "Conectando…" para todo lo que no sea `online`.
-- `roomReducer` está pensado para compartirse: su comentario dice "vengan de ti o de otro usuario".
-- Las imágenes viajan como data URL dentro de `Item.url`. `[TODO: con backend probablemente
-  convenga subirlas aparte y guardar una URL]`
+- `RoomStatus` sigue siendo `connecting | online | missing`: no hay estado de "desconectado".

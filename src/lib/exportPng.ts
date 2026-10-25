@@ -7,6 +7,7 @@ export async function exportPng(element: HTMLElement, filename: string) {
   const canvas = await html2canvas(element, {
     backgroundColor: '#262626',
     scale: 2,
+    useCORS: true,
     ignoreElements: el => el.hasAttribute(EXPORT_IGNORE),
   });
   const a = document.createElement('a');

@@ -1,7 +1,7 @@
 <!-- fuente: src/types.ts, src/room, src/pages, src/components, src/lib | rev: 2aee52f -->
 # TAREAS — recetas "quiero hacer X"
 
-Archivos exactos a tocar, en orden. Sin backend: todo cambio de sala pasa por `RoomAction`.
+Archivos exactos a tocar, en orden. Todo cambio de sala pasa por `RoomAction` (cliente y servidor usan el mismo reducer).
 
 ## Acción nueva sobre la sala (orden obligatorio)
 
@@ -40,13 +40,12 @@ Archivos exactos a tocar, en orden. Sin backend: todo cambio de sala pasa por `R
 3. `document.title` en un `useEffect` (lo hacen `HomePage` y `RoomView`).
 4. Ver [architecture/routing.md](architecture/routing.md).
 
-## Conectar un backend real
+## Cambiar cómo se habla con la API
 
-1. Nueva clase que implemente `RoomService` (`src/room/roomService.ts`).
-2. Cambiar `export const roomService` a la nueva implementación. Componentes no cambian.
-3. Ver contrato y gotchas en [architecture/data-layer.md](architecture/data-layer.md).
-4. Variables de entorno: `VITE_*` en `.env` (ya ignorado en `.gitignore`, `.env.example` permitido).
-   `[TODO: hoy no existe ningún import.meta.env en src/]`
+1. `src/room/signalrRoomService.ts` (HTTP + SignalR). `DEMO42` sigue en `LocalRoomService`.
+2. Un método nuevo de `RoomService` → implementarlo en ambas clases y en el compuesto `roomService`.
+3. Contrato, optimismo y `version` en [architecture/data-layer.md](architecture/data-layer.md).
+4. URL de la API: `VITE_API_URL` en `.env` (ver `.env.example`).
 
 ## Color de fila / límite de filas
 
@@ -55,5 +54,5 @@ Archivos exactos a tocar, en orden. Sin backend: todo cambio de sala pasa por `R
 
 ## Cambiar el formato/tamaño de imágenes subidas
 
-- `IMAGE_SIZE` y calidad webp en `shrink` (`src/lib/image.ts`). Más grande = se llena antes la
-  cuota de `localStorage` (ver [architecture/state-management.md](architecture/state-management.md)).
+- `IMAGE_SIZE` y calidad webp en `shrink` (`src/lib/image.ts`). La API acepta máx `IMAGEN_MAX_KB`
+  (512 KB por defecto); en `DEMO42` más grande = se llena antes la cuota de `localStorage` (ver [architecture/state-management.md](architecture/state-management.md)).

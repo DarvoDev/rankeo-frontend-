@@ -12,8 +12,12 @@ npm run dev
 
 ## Variables de entorno
 
-Ninguna. No hay `import.meta.env` en `src/`. `.gitignore` ya ignora `.env` / `.env.*` (deja pasar
-`.env.example`) pensando en el futuro backend.
+| Variable | Uso |
+|---|---|
+| `VITE_API_URL` | URL de la API Rankeo sin `/` final (p. ej. `http://localhost:8088`). Se lee al compilar. |
+
+`cp .env.example .env`. La API debe incluir el origen del frontend en `CORS_ORIGINS`
+(`http://localhost:5173` en desarrollo). Levantar la API: `docker compose up -d` en `rankeo-backend`.
 
 ## Scripts
 
@@ -34,10 +38,9 @@ tests. Agregar un caso por cada acción nueva (ver [TAREAS.md](../TAREAS.md#acci
 ## Probar a mano
 
 - Sala de ejemplo: `/sala/DEMO42` — se regenera en cada carga y **nunca se guarda**.
-- Salas propias: persisten en `localStorage` del navegador (claves `tierlist:*`). Para empezar
-  limpio, borrar esas claves en DevTools.
+- Salas propias: viven en la API. Para probar el tiempo real abrir la misma sala en dos perfiles.
 - El apodo se guarda en `tierlist:nombre`; borrarlo para volver a ver `NameModal`.
-- `LocalRoomService` añade retrasos falsos (700 ms buscar/crear, 600 ms cargar).
+- `LocalRoomService` (solo `DEMO42`) añade retrasos falsos (700 ms buscar, 600 ms cargar).
 
 ## Convenciones del código
 

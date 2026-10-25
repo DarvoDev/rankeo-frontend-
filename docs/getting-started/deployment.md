@@ -16,7 +16,8 @@ No hay `Dockerfile`, `docker-compose`, CI ni config de hosting (Vercel/Netlify/n
 3. `vite.config.ts` no define `base`: se asume despliegue en la raíz del dominio. En un subpath
    habría que configurar `base` y `basename` del router.
 
-## Sin backend
+## Backend
 
-Desplegar hoy no hace la app colaborativa: cada visitante tiene sus salas en su propio
-navegador. Ver [data-layer.md](../architecture/data-layer.md).
+`VITE_API_URL` se fija **al compilar** (`npm run build`): apuntarla a la URL pública de la API.
+La API debe tener el origen del frontend en `CORS_ORIGINS`, y un proxy delante de la API debe
+dejar pasar WebSocket (`Upgrade`/`Connection`) en `/hubs/sala`. Ver [data-layer.md](../architecture/data-layer.md).

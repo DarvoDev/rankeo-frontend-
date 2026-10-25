@@ -29,7 +29,7 @@ corta ahí (no emite, no loguea, no guarda).
 | `tier:delete` | Borra fila; items al final de `pool` | no existe o es la última |
 | `title:update` | Cambia título | siempre aplica |
 
-## LocalRoomService (`src/room/roomService.ts`)
+## LocalRoomService (`src/room/roomService.ts`) — solo `DEMO42`
 
 - Caché en memoria `Map` por código; `get` cae a `loadRoom` si no está en memoria.
 - `load('DEMO42')` siempre reemplaza con `demoRoom()` y bitácora vacía; DEMO nunca se guarda.

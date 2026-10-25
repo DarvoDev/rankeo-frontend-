@@ -4,10 +4,9 @@
 Tier lists en grupo: crear una sala con código de 6 letras, subir imágenes y arrastrarlas a filas
 S–D, con bitácora de movimientos y exportación a PNG. SPA en React 19 + Vite + TypeScript.
 
-> ⚠️ **No hay backend.** Las salas viven en `localStorage` del navegador detrás de la interfaz
-> `RoomService`. Pese al copy de la portada ("salas en tiempo real"), dos navegadores **no** ven la
-> misma sala, y dos pestañas del mismo navegador **tampoco se sincronizan** (no hay listener del
-> evento `storage` ni `BroadcastChannel`). El README dice que es la versión React del prototipo
+> Las salas viven en la API Rankeo (`rankeo-backend`, HTTP + SignalR, `VITE_API_URL`) y se
+> sincronizan en vivo entre navegadores. Solo `DEMO42` vive en el navegador. Ver
+> [architecture/data-layer.md](architecture/data-layer.md). El README dice que es la versión React del prototipo
 > en `../tierlist-prototipo/` (fuera de este repo).
 
 ## Stack

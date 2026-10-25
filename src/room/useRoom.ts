@@ -27,7 +27,7 @@ export function useRoom(code: string, myName: string) {
       setRoom(loaded?.room ?? null);
       setActivity(loaded?.activity ?? []);
       setStatus(loaded ? 'online' : 'missing');
-    });
+    }, () => { if (!cancelled) toast('No se pudo conectar con la sala.'); });
     return () => { cancelled = true; unsubscribe(); };
   }, [code, toast]);
 

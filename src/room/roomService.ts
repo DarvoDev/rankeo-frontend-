@@ -1,8 +1,9 @@
 import { DEMO_CODE, demoRoom, newRoom } from '../lib/demo';
-import { generateCode, newId } from '../lib/ids';
+import { colorFor, generateCode, newId } from '../lib/ids';
 import { loadActivity, loadRoom, saveActivity, saveRoom } from '../lib/storage';
 import type { ActivityEntry, Person, Room, RoomAction } from '../types';
 import { roomReducer } from './roomReducer';
+import { SignalRRoomService } from './signalrRoomService';
 
 export type RoomEvent =
   | { type: 'state'; room: Room }
@@ -17,14 +18,16 @@ export interface LogEntry {
 
 /**
  * Todo lo que la interfaz necesita de "el servidor".
- * Hoy lo cumple LocalRoomService (navegador + retrasos falsos); con un backend real
- * se escribe otra implementación (p. ej. con WebSockets) y los componentes no cambian.
+ * La cumplen LocalRoomService (navegador + retrasos falsos, solo para DEMO42) y
+ * SignalRRoomService (API real); los componentes no saben cuál es cuál.
  */
 export interface RoomService {
   exists(code: string): Promise<boolean>;
   create(title: string): Promise<Room>;
   load(code: string): Promise<{ room: Room; activity: ActivityEntry[] } | null>;
   dispatch(code: string, action: RoomAction, log?: LogEntry): void;
+  /** Agrega una imagen (data URL ya recortada) al final del banco */
+  addImage(code: string, dataUrl: string, name: string, by: string): Promise<void>;
   subscribe(code: string, listener: (event: RoomEvent) => void): () => void;
 }
 
@@ -100,6 +103,11 @@ class LocalRoomService implements RoomService {
     }
   }
 
+  async addImage(code: string, dataUrl: string, name: string, by: string) {
+    const item = { id: newId(), name, url: dataUrl, by };
+    this.dispatch(code, { type: 'item:add', item }, { who: { name: by, color: colorFor(by) }, text: `subió ${name}` });
+  }
+
   subscribe(code: string, listener: (event: RoomEvent) => void) {
     if (!this.listeners.has(code)) this.listeners.set(code, new Set());
     this.listeners.get(code)!.add(listener);
@@ -111,4 +119,16 @@ class LocalRoomService implements RoomService {
   }
 }
 
-export const roomService: RoomService = new LocalRoomService();
+const local = new LocalRoomService();
+const remote = new SignalRRoomService();
+// DEMO42 vive solo en el navegador (cada visitante tiene su copia); las demás salas, en la API
+const pick = (code: string) => code === DEMO_CODE ? local : remote;
+
+export const roomService: RoomService = {
+  exists: code => pick(code).exists(code),
+  create: title => remote.create(title),
+  load: code => pick(code).load(code),
+  dispatch: (code, action, log) => pick(code).dispatch(code, action, log),
+  addImage: (code, dataUrl, name, by) => pick(code).addImage(code, dataUrl, name, by),
+  subscribe: (code, listener) => pick(code).subscribe(code, listener),
+};

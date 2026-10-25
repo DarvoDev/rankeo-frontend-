@@ -1,7 +1,12 @@
 # Rankeo · frontend
 
 Tier lists en grupo. Versión React del prototipo de `../tierlist-prototipo/`.
-Todavía no hay backend: las salas y su bitácora de movimientos se guardan en el navegador.
+Las salas viven en la API Rankeo (`rankeo-backend`, .NET + SignalR) y se sincronizan en vivo;
+la sala de ejemplo `DEMO42` vive solo en el navegador.
+
+```bash
+cp .env.example .env   # VITE_API_URL=http://localhost:8088
+```
 
 ## Comandos
 
@@ -22,18 +27,18 @@ src/
   lib/                     utilidades: ids, almacenamiento, datos demo, recorte de imágenes, exportar PNG
   room/
     roomReducer.ts         todos los cambios de una sala, como función pura (con pruebas)
-    roomService.ts         "el servidor": interfaz RoomService + LocalRoomService (navegador)
+    roomService.ts         interfaz RoomService + LocalRoomService (DEMO42) + compuesto
+    signalrRoomService.ts  salas reales contra la API (HTTP + SignalR)
     useRoom.ts             estado de la sala y su bitácora
     useImageInput.ts       soltar y pegar imágenes
   components/ui|home|room  componentes, cada uno con su .module.css
   pages/                   HomePage (/) y RoomPage (/sala/:codigo)
 ```
 
-## Conectar un backend
+## Backend
 
-Implementa la interfaz `RoomService` de `src/room/roomService.ts` (por ejemplo con WebSockets)
-y exporta esa implementación en lugar de `LocalRoomService`. Los cambios y las entradas de bitácora
-de otros usuarios llegarán por `subscribe` (eventos `state` y `activity`).
+`src/room/signalrRoomService.ts` implementa `RoomService` contra la API (HTTP + SignalR en
+`/hubs/sala`). La API debe incluir el origen del frontend en `CORS_ORIGINS`.
 
 ## Desplegar
 

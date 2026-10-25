@@ -1,7 +1,7 @@
 # Rankeo · frontend
 
-Tier lists en grupo. SPA React 19 + Vite + TS. Sin backend: las salas viven en `localStorage`
-detrás de `RoomService` (`src/room/roomService.ts`).
+Tier lists en grupo. SPA React 19 + Vite + TS. Las salas viven en la API Rankeo (HTTP + SignalR,
+`VITE_API_URL`) detrás de `RoomService` (`src/room/roomService.ts`); `DEMO42` solo en el navegador.
 
 ## Protocolo de búsqueda (en este orden, no lo saltes)
 

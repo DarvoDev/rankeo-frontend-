@@ -22,7 +22,8 @@ export function ItemCard({ item, placeholder, overlay, ref, className, ...rest }
       title={item.by ? `${item.name} · subida por ${item.by}` : item.name}
       {...rest}
     >
-      <img src={item.url} alt={item.name} draggable={false} />
+      {/* crossOrigin: las imágenes de la API vienen de otro origen y el PNG las necesita sin "tainted" */}
+      <img src={item.url} alt={item.name} draggable={false} crossOrigin="anonymous" />
     </div>
   );
 }

@@ -21,11 +21,15 @@ export function JoinModal({ onClose }: { onClose: () => void }) {
       return;
     }
     setSearching(true);
-    if (await roomService.exists(normalized)) {
-      navigate(`/sala/${normalized}`);
-      return;
+    try {
+      if (await roomService.exists(normalized)) {
+        navigate(`/sala/${normalized}`);
+        return;
+      }
+      setError(`No existe ninguna sala con el código ${normalized}.`);
+    } catch (error) {
+      setError((error as Error).message);
     }
-    setError(`No existe ninguna sala con el código ${normalized}.`);
     setSearching(false);
   }
 
