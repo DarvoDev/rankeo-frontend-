@@ -1,4 +1,4 @@
-<!-- fuente: src/room/roomService.ts, src/room/signalrRoomService.ts, src/room/useRoom.ts | rev: 0ed1e18 -->
+<!-- fuente: src/room/roomService.ts, src/room/signalrRoomService.ts, src/room/useRoom.ts | rev: cad3d25 -->
 # Capa de datos — `RoomService`
 
 La UI solo habla con la interfaz `RoomService` (`src/room/roomService.ts`). `roomService` es un

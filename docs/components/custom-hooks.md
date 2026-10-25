@@ -1,4 +1,4 @@
-<!-- fuente: src/room/useRoom.ts, src/room/useImageInput.ts, src/components/ui/toastContext.ts | rev: 0ed1e18 -->
+<!-- fuente: src/room/useRoom.ts, src/room/useImageInput.ts, src/components/ui/toastContext.ts | rev: cad3d25 -->
 # Hooks propios
 
 Todos en uso; ninguno legado.

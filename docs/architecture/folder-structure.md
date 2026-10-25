@@ -1,4 +1,4 @@
-<!-- fuente: src | rev: 0ed1e18 -->
+<!-- fuente: src | rev: cad3d25 -->
 # Estructura de carpetas
 
 ~2.400 líneas en total. No hay god-files; el más grande es `TierBoard.tsx` (~240 líneas), que

@@ -1,4 +1,4 @@
-<!-- fuente: README.md, package.json, vite.config.ts, src/App.tsx, Dockerfile, nginx.conf | rev: 0ed1e18 -->
+<!-- fuente: README.md, package.json, vite.config.ts, src/App.tsx, Dockerfile, nginx.conf | rev: cad3d25 -->
 # Despliegue
 
 ## Docker
