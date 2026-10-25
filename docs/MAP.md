@@ -52,7 +52,7 @@ Primer destino de toda búsqueda. Regenerar la columna mecánica con `sh docs/do
 | `generateCode` | `src/lib/ids.ts` | Código de sala de 6 chars sin 0/O/1/I |
 | `normalizeCode` | `src/lib/ids.ts` | Mayúsculas, quita todo lo no `A-Z0-9` |
 | `colorFor` | `src/lib/ids.ts` | Color HSL estable a partir de un nombre |
-| `shrink` | `src/lib/image.ts` | Recorte cuadrado 256px → data URL webp |
+| `shrink` | `src/lib/image.ts` | Recorte cuadrado 768px → data URL webp |
 | `getName`, `setName` | `src/lib/storage.ts` | Apodo en `localStorage` |
 | `loadRoom`, `saveRoom`, `loadActivity`, `saveActivity` | `src/lib/storage.ts` | Persistencia en `localStorage` (nunca lanzan) |
 
@@ -68,7 +68,7 @@ Primer destino de toda búsqueda. Regenerar la columna mecánica con `sh docs/do
 | `TierBoard` | `src/components/room/TierBoard.tsx` | `DndContext` del tablero |
 | `TierRow`, `TierMenu` | `src/components/room/` | Fila y su menú ⚙ |
 | `DropZone` | `src/components/room/DropZone.tsx` | Contenedor ordenable (fila o banco) |
-| `ItemCard`, `SortableItem` | `src/components/room/ItemCard.tsx` | Imagen; versión arrastrable |
+| `ItemCard`, `SortableItem` | `src/components/room/ItemCard.tsx` | Imagen; versión arrastrable; doble clic = vista ampliada (`Modal`) |
 | `Bank` | `src/components/room/Bank.tsx` | Banco + botón "Subir imágenes" |
 | `Trash`, `TRASH` | `src/components/room/Trash.tsx` | Papelera droppable (solo ratón/táctil) |
 | `Sidebar` | `src/components/room/Sidebar.tsx` | Bitácora |

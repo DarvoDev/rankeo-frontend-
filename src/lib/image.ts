@@ -1,4 +1,4 @@
-const IMAGE_SIZE = 256; // las imágenes subidas se recortan a un cuadrado de este tamaño
+const IMAGE_SIZE = 768; // las imágenes subidas se recortan a un cuadrado de este tamaño (grande para verlas ampliadas)
 
 /** Recorta al centro en cuadrado y reduce para que quepa en el almacenamiento del navegador */
 export async function shrink(file: File): Promise<string> {
