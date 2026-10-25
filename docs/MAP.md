@@ -1,4 +1,4 @@
-<!-- fuente: src | rev: 2aee52f -->
+<!-- fuente: src | rev: 0ed1e18 -->
 # MAP — dónde está cada cosa
 
 Primer destino de toda búsqueda. Regenerar la columna mecánica con `sh docs/docs.sh map`.

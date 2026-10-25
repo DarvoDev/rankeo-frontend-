@@ -1,4 +1,4 @@
-<!-- fuente: package.json, README.md, .gitignore, src/room/roomReducer.test.ts | rev: 2aee52f -->
+<!-- fuente: package.json, README.md, .gitignore, src/room/roomReducer.test.ts | rev: 0ed1e18 -->
 # Desarrollo
 
 ## Instalar

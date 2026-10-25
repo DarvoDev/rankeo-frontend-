@@ -1,4 +1,4 @@
-<!-- fuente: src/pages, src/components/home, src/components/room | rev: 2aee52f -->
+<!-- fuente: src/pages, src/components/home, src/components/room | rev: 0ed1e18 -->
 # Páginas y componentes
 
 ## Portada (`HomePage`, `src/components/home/`)
@@ -37,7 +37,9 @@ Título vacío al crear → `newRoom` usa `'Mi Tier List'`.
 ### Subir imágenes (`addImages` en `RoomPage`)
 
 Filtra `image/*`; nombre = nombre de archivo sin extensión, máx 30 chars (o `'Imagen'`);
-`shrink` → `item:add` con `by: myName`, bitácora "subió X". Error → toast "No se pudo leer …".
+`shrink` → `roomService.addImage(code, dataUrl, name, myName)`. En `DEMO42` es un `item:add` local con
+bitácora "subió X"; en las demás salas, `POST` multipart a la API (el servidor escribe la bitácora).
+`shrink` falla → toast "No se pudo leer …"; la API rechaza → toast con su `detail`.
 Secuencial (un `await` por archivo).
 
 ## TierBoard

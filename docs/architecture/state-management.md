@@ -1,4 +1,4 @@
-<!-- fuente: src/room/roomReducer.ts, src/room/roomService.ts, src/room/useRoom.ts, src/lib/storage.ts, src/components/room/TierBoard.tsx | rev: 2aee52f -->
+<!-- fuente: src/room/roomReducer.ts, src/room/roomService.ts, src/room/useRoom.ts, src/lib/storage.ts, src/components/room/TierBoard.tsx | rev: 0ed1e18 -->
 # Estado
 
 Sin zustand/redux/context de datos. Tres capas:

@@ -1,4 +1,4 @@
-<!-- fuente: src/styles/global.css, src/pages/HomePage.module.css, src/lib/exportPng.ts | rev: 2aee52f -->
+<!-- fuente: src/styles/global.css, src/pages/HomePage.module.css, src/lib/exportPng.ts | rev: 0ed1e18 -->
 # Estilos
 
 CSS Modules (`<Componente>.module.css` junto a cada `.tsx`) + `src/styles/global.css`. Sin

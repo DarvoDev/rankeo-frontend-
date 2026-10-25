@@ -1,4 +1,4 @@
-<!-- fuente: src/room/useRoom.ts, src/room/useImageInput.ts, src/components/ui/toastContext.ts | rev: 2aee52f -->
+<!-- fuente: src/room/useRoom.ts, src/room/useImageInput.ts, src/components/ui/toastContext.ts | rev: 0ed1e18 -->
 # Hooks propios
 
 Todos en uso; ninguno legado.
@@ -9,6 +9,7 @@ Todos en uso; ninguno legado.
 
 - Al montar: `roomService.subscribe(code, …)` y luego `roomService.load(code)`.
 - `status`: `'connecting'` → `'online'` si `load` trae sala, `'missing'` si no.
+- Si `load` falla (red, API caída): toast "No se pudo conectar con la sala." y se queda en `connecting`.
 - `dispatch(action, text?)`: con `text` agrega `{ who: me, text }` a la bitácora.
 - `me = { name: myName, color: colorFor(myName) }`.
 - Eventos `warning` → `toast`.

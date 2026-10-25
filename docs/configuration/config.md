@@ -1,4 +1,4 @@
-<!-- fuente: vite.config.ts, tsconfig.json, tsconfig.app.json, tsconfig.node.json, .oxlintrc.json, package.json, index.html, .gitignore | rev: 2aee52f -->
+<!-- fuente: vite.config.ts, tsconfig.json, tsconfig.app.json, tsconfig.node.json, .oxlintrc.json, package.json, index.html, .gitignore | rev: 0ed1e18 -->
 # Configuración
 
 ## vite.config.ts

@@ -1,4 +1,4 @@
-<!-- fuente: src/App.tsx, src/pages/RoomPage.tsx, src/components/home/Hero.tsx, src/components/home/JoinModal.tsx | rev: 2aee52f -->
+<!-- fuente: src/App.tsx, src/pages/RoomPage.tsx, src/components/home/Hero.tsx, src/components/home/JoinModal.tsx | rev: 0ed1e18 -->
 # Rutas
 
 Router declarativo en `src/App.tsx` (`react-router-dom` 7, `BrowserRouter`). Sin middleware ni
@@ -15,6 +15,7 @@ guards: la única "protección" es pedir apodo dentro de `RoomPage`.
 1. Desde `Hero` (crear): `roomService.create(título)` → `navigate('/sala/<code>', { state: { created: true } })`.
    `RoomView` lee `location.state.created` y muestra el toast "Sala creada. Código: …".
 2. Desde `JoinModal`: exige 6 caracteres tras `normalizeCode`, luego `roomService.exists` → navega.
+   Si la API no responde, muestra el error en el modal (no se queda en "Buscando…").
 3. Enlace directo / "Ver ejemplo" (`/sala/DEMO42`): sin validación previa.
 
 ## Dentro de `RoomPage`

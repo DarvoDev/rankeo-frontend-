@@ -1,4 +1,4 @@
-<!-- fuente: README.md, package.json, vite.config.ts, src/App.tsx | rev: 2aee52f -->
+<!-- fuente: README.md, package.json, vite.config.ts, src/App.tsx | rev: 0ed1e18 -->
 # Despliegue
 
 No hay `Dockerfile`, `docker-compose`, CI ni config de hosting (Vercel/Netlify/nginx) en el repo.

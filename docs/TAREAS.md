@@ -1,4 +1,4 @@
-<!-- fuente: src/types.ts, src/room, src/pages, src/components, src/lib | rev: 2aee52f -->
+<!-- fuente: src/types.ts, src/room, src/pages, src/components, src/lib | rev: 0ed1e18 -->
 # TAREAS — recetas "quiero hacer X"
 
 Archivos exactos a tocar, en orden. Todo cambio de sala pasa por `RoomAction` (cliente y servidor usan el mismo reducer).

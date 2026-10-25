@@ -1,4 +1,4 @@
-<!-- fuente: package.json, README.md, src/App.tsx | rev: 2aee52f -->
+<!-- fuente: package.json, README.md, src/App.tsx | rev: 0ed1e18 -->
 # Rankeo · frontend
 
 Tier lists en grupo: crear una sala con código de 6 letras, subir imágenes y arrastrarlas a filas

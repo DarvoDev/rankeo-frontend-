@@ -1,4 +1,4 @@
-<!-- fuente: src | rev: 2aee52f -->
+<!-- fuente: src | rev: 0ed1e18 -->
 # Estructura de carpetas
 
 ~2.400 líneas en total. No hay god-files; el más grande es `TierBoard.tsx` (~240 líneas), que
@@ -18,10 +18,11 @@ src/
     exportPng.ts           html2canvas → descarga PNG
     ids.ts                 ids, códigos de sala, colorFor
     image.ts               shrink (recorte/reducción de imágenes)
-    storage.ts             localStorage seguro (nunca lanza)
+    storage.ts             localStorage seguro (apodo + salas DEMO42; nunca lanza)
   room/                    dominio de la sala
     roomReducer.ts         mutaciones puras  (+ roomReducer.test.ts)
-    roomService.ts         RoomService + LocalRoomService + singleton roomService
+    roomService.ts         RoomService + LocalRoomService (DEMO42) + roomService compuesto
+    signalrRoomService.ts  SignalRRoomService: salas reales contra la API (HTTP + SignalR)
     useRoom.ts             hook de estado de sala
     useImageInput.ts       hook de drop/paste de archivos
   pages/

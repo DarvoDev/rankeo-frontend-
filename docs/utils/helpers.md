@@ -1,4 +1,4 @@
-<!-- fuente: src/lib | rev: 2aee52f -->
+<!-- fuente: src/lib | rev: 0ed1e18 -->
 # Utilidades (`src/lib/`)
 
 Sin dependencias de React. `storage.ts` en [state-management.md](../architecture/state-management.md#persistencia-srclibstoragets).
@@ -30,8 +30,8 @@ imágenes más chicas) y devuelve `data:image/webp` calidad 0.85. Lanza si el ar
 
 ## exportPng.ts
 
-`exportPng(element, filename)` — `import('html2canvas')` bajo demanda, escala 2, fondo
-`#262626`, ignora nodos con `EXPORT_IGNORE` (`data-export-ignore`); descarga `<filename|tierlist>.png`.
+`exportPng(element, filename)` — `import('html2canvas')` bajo demanda, escala 2, `useCORS: true`
+(imágenes servidas desde la API; requiere `crossOrigin="anonymous"` en `ItemCard`), fondo `#262626`, ignora nodos con `EXPORT_IGNORE` (`data-export-ignore`); descarga `<filename|tierlist>.png`.
 
 ## cx.ts
 
