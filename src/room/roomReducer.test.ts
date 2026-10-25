@@ -26,6 +26,13 @@ describe('roomReducer', () => {
     expect(containerOf(room, 'a')).toBe(s);
   });
 
+  it('cambia el brillo de una fila sin tocar nombre ni color', () => {
+    const room = roomWith();
+    const { id, label, color } = room.tiers[0];
+    const next = roomReducer(room, { type: 'tier:update', id, glow: 2 });
+    expect(next.tiers[0]).toMatchObject({ label, color, glow: 2 });
+  });
+
   it('reordena dentro de la misma fila', () => {
     let room = roomWith('a', 'b', 'c');
     room = roomReducer(room, { type: 'item:move', id: 'a', target: POOL, index: 2 });

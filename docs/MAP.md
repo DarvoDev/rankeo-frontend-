@@ -66,7 +66,7 @@ Primer destino de toda búsqueda. Regenerar la columna mecánica con `sh docs/do
 | `Nav`, `Hero`, `HowItWorks`, `Footer`, `Logo`, `DecoCards` | `src/components/home/` | Secciones de la portada |
 | `JoinModal` | `src/components/home/JoinModal.tsx` | Unirse con código (valida 6 chars + `exists`) |
 | `TierBoard` | `src/components/room/TierBoard.tsx` | `DndContext` del tablero |
-| `TierRow`, `TierMenu` | `src/components/room/` | Fila y su menú ⚙ |
+| `TierRow`, `TierMenu` | `src/components/room/` | Fila y su menú ⚙ (color, slider de brillo `glow` 0–3) |
 | `DropZone` | `src/components/room/DropZone.tsx` | Contenedor ordenable (fila o banco) |
 | `ItemCard`, `SortableItem` | `src/components/room/ItemCard.tsx` | Imagen; versión arrastrable; doble clic = vista ampliada (`Modal`) |
 | `Bank` | `src/components/room/Bank.tsx` | Banco + botón "Subir imágenes" |
@@ -89,7 +89,7 @@ Primer destino de toda búsqueda. Regenerar la columna mecánica con `sh docs/do
 | Eliminar imagen | `Trash` (arrastre) o Supr/Retroceso (`onKeyDown` en `TierBoard`) → `item:delete` |
 | Drag con teclado / lector de pantalla | `keyboardCoordinates`, `announcements`, `collisionDetection` en `TierBoard` |
 | Subir / pegar / soltar imágenes | `Bank` (input), `useImageInput` (ventana), `addImages` en `RoomPage`, `shrink` |
-| Filas: añadir, color, subir/bajar, vaciar, borrar | `addTier` en `RoomPage`; `TierMenu`; casos `tier:*` en `roomReducer` |
+| Filas: añadir, color, brillo, subir/bajar, vaciar, borrar | `addTier` en `RoomPage`; `TierMenu`; casos `tier:*` en `roomReducer` |
 | Límite de filas / mínimo una fila | `MAX_TIERS`; `tier:add` y `tier:delete` en `roomReducer` |
 | Título editable | `EditableText` en `RoomPage` → `title:update` |
 | Bitácora de movimientos | texto en cada `act(..., text)`; `LocalRoomService.dispatch` (máx 100); `Sidebar` |

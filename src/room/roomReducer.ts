@@ -58,6 +58,7 @@ export function roomReducer(room: Room, action: RoomAction): Room {
           ...t,
           label: action.label ?? t.label,
           color: action.color ?? t.color,
+          glow: action.glow ?? t.glow,
         }),
       };
 

@@ -47,6 +47,14 @@ Archivos exactos a tocar, en orden. Todo cambio de sala pasa por `RoomAction` (c
 3. Contrato, optimismo y `version` en [architecture/data-layer.md](architecture/data-layer.md).
 4. URL de la API: `VITE_API_URL` en `.env` (ver `.env.example`).
 
+## Brillo (glow) de fila
+
+- Dato: `Tier.glow` (0–3) en `src/types.ts`; se cambia con `tier:update` (`roomReducer`). El backend valida
+  el rango en `SalaService.Validar` y lo refleja en `Dominio/Room.cs` (`rankeo-backend`).
+- Aspecto: `.glow1`–`.glow3` en `TierRow.module.css` (`box-shadow` con `--glow-color` = color de la fila).
+- Control: slider "Brillo" en `TierMenu`. Subir el máximo = cambiar `max` del slider, las clases CSS y el
+  rango en el backend.
+
 ## Color de fila / límite de filas
 
 - Paleta: `TIER_COLORS` en `src/lib/demo.ts` (la usan `TierMenu`, `newRoom` y `addTier`).

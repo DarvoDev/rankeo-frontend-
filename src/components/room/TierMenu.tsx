@@ -6,16 +6,18 @@ import styles from './TierMenu.module.css';
 interface Props {
   label: string;
   color: string;
+  glow: number;
   canUp: boolean;
   canDown: boolean;
   onColor: (color: string) => void;
+  onGlow: (glow: number) => void;
   onMove: (dir: 'up' | 'down') => void;
   onClear: () => void;
   onDelete: () => void;
 }
 
 /** Botón ⚙ de cada fila con su menú de opciones */
-export function TierMenu({ label, color, canUp, canDown, onColor, onMove, onClear, onDelete }: Props) {
+export function TierMenu({ label, color, glow, canUp, canDown, onColor, onGlow, onMove, onClear, onDelete }: Props) {
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
 
@@ -59,6 +61,15 @@ export function TierMenu({ label, color, canUp, canDown, onColor, onMove, onClea
               />
             ))}
           </div>
+          <label className={styles.glow}>
+            Brillo
+            <input
+              type="range" min={0} max={3} step={1}
+              value={glow}
+              onChange={e => onGlow(Number(e.target.value))}
+              aria-valuetext={glow ? `nivel ${glow}` : 'apagado'}
+            />
+          </label>
           <button className={styles.item} onClick={() => onMove('up')} disabled={!canUp}>↑ Subir fila</button>
           <button className={styles.item} onClick={() => onMove('down')} disabled={!canDown}>↓ Bajar fila</button>
           <button className={styles.item} onClick={closeAfter(onClear)}>Vaciar fila</button>

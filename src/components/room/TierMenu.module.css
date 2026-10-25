@@ -19,6 +19,8 @@
   border-radius: 50%; border: 2px solid transparent;
 }
 .swatches .active { border-color: #fff; }
+.glow { display: flex; align-items: center; gap: 8px; padding: 0 8px 6px; color: var(--muted); font-size: .9rem; }
+.glow input { flex: 1; accent-color: var(--accent); }
 .item {
   display: block; width: 100%; text-align: left;
   margin-top: 4px; background: transparent; border: none; padding: 7px 8px;
